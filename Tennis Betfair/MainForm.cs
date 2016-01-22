@@ -6,27 +6,33 @@
 // applicable laws. 
 #endregion
 using System;
+using Tennis_Betfair.DBO;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms;
-using Api_ng_sample_code;
+using System.Threading.Tasks;
+using System.Net;
+using System.IO;
+using System.Threading;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Tennis_Betfair
 {
     public partial class MainForm : Syncfusion.Windows.Forms.MetroForm
     {
+        
         public MainForm()
         {
             InitializeComponent();
         }
 
-        private void refreshButton_Click(object sender, EventArgs e)
+        private void buttonAdv1_Click(object sender, EventArgs e)
         {
-
+            var betfair = new Betfair();
+            var elem = betfair.GetInPlayAllMarkets();
+            var elem2 = betfair.GetScoreEvent(elem.FirstOrDefault().eventId);
         }
     }
 }

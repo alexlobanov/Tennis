@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Tennis_Betfair
 {
-    class Market
+    public class Market
     {
     }
 }

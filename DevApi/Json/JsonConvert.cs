@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace Api_ng_sample_code.Json
 {
-    class JsonConvert
+    public class JsonConvert
     {
 
         public static JsonResponse<T> Import<T>(TextReader reader)
