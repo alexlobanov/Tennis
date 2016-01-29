@@ -11,15 +11,12 @@ using Tennis_Betfair.DBO;
 using Tennis_Betfair.Tennis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Web.Services.Protocols;
-using System.Net;
-using System.IO;
 using Tennis_Betfair.TO.BetFair.GetMarkets;
 using Tennis_Betfair.TO.BetFair.GetScore;
 
 namespace Tennis_Betfair.DBO
 {
-    class Betfair
+    public class Betfair
     {
         private const string URL_GET_ALL_MARKETS =
             "https://www.betfair.com/inplayservice/v1.1/eventsInPlay?regionCode=UK&alt=json&locale=en_GB&channel=WEB&maxResults=100&eventTypeIds=2";
