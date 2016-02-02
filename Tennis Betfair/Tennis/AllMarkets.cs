@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Tennis_Betfair.DBO;
 using Tennis_Betfair.DBO.ParserBet365;
 using Tennis_Betfair.Events;
+using Tennis_Betfair.TO;
 using Tennis_Betfair.TO.Bet365;
 using Tennis_Betfair.TO.BetFair.GetMarkets;
 using Tennis_Betfair.TO.BetFair.GetScore;
@@ -15,12 +17,23 @@ namespace Tennis_Betfair.Tennis
 {
     public class AllMarkets
     {
+        private static object objectTolock = new object();
+        private static object lockMarkets = new object();
         private Betfair betfair;
         private Bet365Class bet365Class;
 
         private HashSet<Market> allMarkets;
 
-        public HashSet<Market> AllMarketsHashSet => allMarkets;
+        public HashSet<Market> AllMarketsHashSet
+        {
+            get
+            {
+                lock (lockMarkets)
+                {
+                    return allMarkets;
+                }
+            }
+        }
 
         public ThreadControl threadControl;
 
@@ -41,7 +54,35 @@ namespace Tennis_Betfair.Tennis
 
         public void StartThreads()
         {
-            threadControl.StartThreads();
+          
+                threadControl.Get365All();
+                threadControl.GetBetfairAll();
+      
+            //threadControl.StartThreads();
+        }
+
+        public void AbortThreads()
+        {
+            
+        }
+
+        public void MarketIgnore(int eventId)
+        {
+            threadControl.MarketIgnore(eventId);
+        }
+
+
+        public ThreadStatus GetStatus()
+        {
+            try
+            {
+                return threadControl.GetStatus();
+            }
+            catch (Exception)
+            {
+                return null;
+                /**/
+            }
         }
 
         public void StopThreads()
@@ -86,19 +127,24 @@ namespace Tennis_Betfair.Tennis
             ParseDate(betfairAll);
         }
 
-        public void GetScoreMarket(string eventId, bool isBetfair)
+        public bool GetScoreMarket(string eventId, bool isBetfair)
         {
             if (isBetfair)
             {
                 var betfairReturn =
                     betfair.GetScoreEvent(long.Parse(eventId));
+                if (betfairReturn.Count == 0) return false;
+                if (betfairReturn[0].matchStatus == null) return false;
                 ParseDate(betfairReturn);
+                return true;
             }
             else
             {
                 var bet365Return =
                     bet365Class.GetScoreEvent(eventId);
+                if (bet365Return == null) return false;
                 ParseDate(bet365Return);
+                return true;
             }
         }
 
@@ -119,25 +165,30 @@ namespace Tennis_Betfair.Tennis
 
         private void ParseDate(object objectToParse)
         {
-            lock (threadControl._lockAll)
+            
+            if (objectToParse is List<Event>)
             {
-                if (objectToParse is List<Event>)
+                ParseAllData((List<Event>)objectToParse);
+            }
+            if (objectToParse is List<GetMarketData>)
+            {
+                ParseAllData((List<GetMarketData>)objectToParse);
+            }
+            if (objectToParse is List<GetScore>)
+            {
+                lock (objectTolock)
                 {
-                    ParseAllData((List<Event>)objectToParse);
-                }
-                if (objectToParse is List<GetMarketData>)
-                {
-                    ParseAllData((List<GetMarketData>)objectToParse);
-                }
-                if (objectToParse is List<GetScore>)
-                {
-                    ParseAllData((List<GetScore>)objectToParse);
-                }
-                if (objectToParse is Event)
-                {
-                    ParseAllData((Event)objectToParse);
+                    ParseAllData((List<GetScore>) objectToParse);
                 }
             }
+            if (objectToParse is Event)
+            {
+                lock (objectTolock)
+                {
+                    ParseAllData((Event) objectToParse);
+                }
+            }
+            
         }
 
         /// <summary>
@@ -146,25 +197,56 @@ namespace Tennis_Betfair.Tennis
         /// <param name="betfairAllDatas"></param>
         private void ParseAllData(List<GetMarketData> betfairAllDatas)
         {
-            if (betfairAllDatas == null) throw new ArgumentNullException(nameof(betfairAllDatas));
-            foreach (var betfairAllData in betfairAllDatas)
+            int count = 0;
+            try
             {
-                try
+                if (betfairAllDatas == null) throw new ArgumentNullException(nameof(betfairAllDatas));
+                foreach (var betfairAllData in betfairAllDatas)
                 {
-                    var name = betfairAllData.competitionName;
-                    var player1 = betfairAllData.runners.runner1Name;
-                    var player2 = betfairAllData.runners.runner2Name;
-                    var marketIdBetfair = betfairAllData.eventId.ToString();
-                    allMarkets.Add(
-                        new Market(name,
-                            new Player(player1, null, true),
-                            new Player(player2, null, true),marketIdBetfair,true)
-                        );
+                    try
+                    {
+                        var name = betfairAllData.competitionName;
+                        var player1 = betfairAllData.runners.runner1Name;
+                        var player2 = betfairAllData.runners.runner2Name;
+                        var marketIdBetfair = betfairAllData.eventId.ToString();
+                        bool flag = false;
+                        foreach (var allMarket in AllMarketsHashSet.Where(allMarket
+                            =>
+                        {
+                            return allMarket.Player2.Name != null && (allMarket.Player1.Name != null && ((allMarket.Player1.Name.Equals(player1))
+                                                                                                         || (allMarket.Player2.Name.Equals(player2))));
+                        }))
+                        {
+                            flag = true;
+                            allMarket.MarketName = name;
+                            allMarket.Player1.Name = player1;
+                            allMarket.Player2.Name = player2;
+                            allMarket.BetfairEventId = marketIdBetfair;
+                            allMarket.updateFirstScore();
+                        }
+                        if (!flag)
+                        {
+                            AllMarketsHashSet.Add(
+                                new Market(name,
+                                    new Player(player1, null, true),
+                                    new Player(player2, null, true), marketIdBetfair, true)
+                                );
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("Exeption in parse: " + ex.Message);
+                        /*ignored*/
+                    }
                 }
-                catch (Exception ex )
+                count = 0;
+            }
+            catch (Exception)
+            {
+                count++;
+                if (count >= 20)
                 {
-                    Debug.WriteLine("Exeption in parse: " + ex.Message);
-                    /*ignored*/
+                    throw new Exception("Ошибка в обработке маркетов");
                 }
             }
         }
@@ -172,53 +254,113 @@ namespace Tennis_Betfair.Tennis
         private void ParseAllData(List<Event> b365AllData)
         {
             if (b365AllData == null) throw new ArgumentNullException(nameof(b365AllData));
-            foreach (var b365Data in b365AllData)
+            int count = 0;
+            try
             {
-                var name = b365Data.CompetitionType;
-                var player1 = b365Data.Team1.getName();
-                var player2 = b365Data.Team2.getName();
-                var score1 = b365Data.Team1.getScore();
-                var score2 = b365Data.Team2.getScore();
-                var eventId = b365Data.EventId;
-                allMarkets.Add(
-                    new Market(name,
-                        new Player(player1, score1, false),
-                        new Player(player2, score2, false), eventId, false)
-                    );
+                foreach (var b365Data in b365AllData)
+                {
+                    var name = b365Data.CompetitionType;
+                    var player1 = b365Data.Team1.getName();
+                    var player2 = b365Data.Team2.getName();
+                    var score1 = b365Data.Team1.getScore();
+                    var score2 = b365Data.Team2.getScore();
+                    var eventId = b365Data.EventId;
+                    bool flag = false;
+                    foreach (var allMarket in AllMarketsHashSet.Where(allMarket
+                            => allMarket.Player2.Name != null &&
+                               (allMarket.Player1.Name != null &&
+                                ((allMarket.Player1.Name.Equals(player1))
+                                 || (allMarket.Player2.Name.Equals(player2))))))
+                    {
+                        flag = true;
+                        allMarket.MarketName = name;
+                        allMarket.Player1.Name = player1;
+                        allMarket.Player2.Name = player2;
+                        allMarket.Bet365EventId = eventId;
+                        allMarket.updateFirstScore();
+                    }
+                    if (!flag)
+                    {
+                        AllMarketsHashSet.Add(
+                            new Market(name,
+                                new Player(player1, score1, false),
+                                new Player(player2, score2, false), eventId, false)
+                            );
+                    }
+                }
+                count = 0;
             }
+            catch (Exception)
+            {
+                count++;
+                if (count >= 20)
+                {
+                    throw new Exception("Ошибка в обработке маркетов");
+                }
+            }
+           
         }
 
         private void ParseAllData(List<GetScore> betfairSingleData)
         {
-            if (betfairSingleData == null) throw new ArgumentNullException(nameof(betfairSingleData));
-            if (betfairSingleData.Count == 0) return;
-            var eventId = betfairSingleData[0].eventId;
-            foreach (var allMarket in allMarkets)
+            int count = 0;
+            try
             {
-                if (allMarket.BetfairEventId != null && eventId == int.Parse(allMarket.BetfairEventId))
+
+                if (betfairSingleData == null) throw new ArgumentNullException(nameof(betfairSingleData));
+                if (betfairSingleData.Count == 0) return;
+                var eventId = betfairSingleData[0].eventId;
+                foreach (var allMarket in AllMarketsHashSet)
                 {
-                    allMarket.Player1.ScoreBetfair1 = 
-                        betfairSingleData[0].score.home.score;
-                    allMarket.Player2.ScoreBetfair1 =
-                       betfairSingleData[0].score.away.score;
-                    playerChanged?.Invoke(new ScoreUpdEventArgs(allMarket));
+                    if (allMarket.BetfairEventId != null && eventId == int.Parse(allMarket.BetfairEventId))
+                    {
+                        allMarket.Player1.ScoreBetfair1 =
+                            betfairSingleData[0].score.home.score;
+                        allMarket.Player2.ScoreBetfair1 =
+                            betfairSingleData[0].score.away.score;
+                        if (betfairSingleData[0].matchStatus.ToLower() == "finished")
+                            allMarket.IsClose = true;
+                        playerChanged?.Invoke(new ScoreUpdEventArgs(allMarket));
+                    }
+                }
+                count = 0;
+            }
+            catch (Exception)
+            {
+                count++;
+                if (count >= 20)
+                {
+                    throw new Exception("Ошибка в обработке маркетов");
                 }
             }
         }
 
         private void ParseAllData(Event b365SingleData)
         {
-            var eventId = b365SingleData.EventId;
-            foreach (var allMarket in allMarkets)
+            int count = 0;
+            try
             {
-                if (allMarket.Bet365EventId != null 
-                    && allMarket.Bet365EventId.Equals(eventId))
+                var eventId = b365SingleData.EventId;
+                foreach (var allMarket in AllMarketsHashSet)
                 {
-                    allMarket.Player1.ScoreBet366 = 
-                        b365SingleData.Team1.getScore();
-                    allMarket.Player2.ScoreBet366 = 
-                        b365SingleData.Team2.getScore();
-                    playerChanged?.Invoke(new ScoreUpdEventArgs(allMarket));
+                    if (allMarket.Bet365EventId != null
+                        && allMarket.Bet365EventId.Equals(eventId))
+                    {
+                        allMarket.Player1.ScoreBet366 =
+                            b365SingleData.Team1.getScore();
+                        allMarket.Player2.ScoreBet366 =
+                            b365SingleData.Team2.getScore();
+                        playerChanged?.Invoke(new ScoreUpdEventArgs(allMarket));
+                    }
+                }
+                count = 0;
+            }
+            catch (Exception)
+            {
+                count++;
+                if (count >= 20)
+                {
+                    throw new Exception("Ошибка в обработке маркетов");
                 }
             }
         }
@@ -227,18 +369,19 @@ namespace Tennis_Betfair.Tennis
         {
             public bool Equals(Market b1, Market b2)
             {
-
-                if (b2 == null && b1 == null)
+                if ((b1.Player1.Name == null) && (b2.Player1.Name == null))
                     return true;
                 else if (b1 == null | b2 == null)
                     return false;
-                else if (b1.Player1.Name.Equals(b2.Player1.Name) 
-                    || (b2.Player2.Name.Equals(b1.Player2.Name)))
+                else if (b1.Player1.Name == null | b2.Player1.Name == null)
+                    return false;
+                else if ((b1.Player1.Name.Equals(b2.Player1.Name)) || (b1.Player2.Name.Equals(b2.Player2.Name)))
                 {
                     if (b1.Bet365EventId == null)
                         b1.Bet365EventId = b2.Bet365EventId;
                     if (b1.BetfairEventId == null)
                         b1.BetfairEventId = b2.BetfairEventId;
+                    Debug.WriteLine("Одинаковые: " + b1.Player1.Name + " : " + b1.Player2.Name + " Idb: " + b1.BetfairEventId + " 2: " + b1.Bet365EventId);
                     return true;
                 }
                 else
@@ -247,8 +390,16 @@ namespace Tennis_Betfair.Tennis
 
             public int GetHashCode(Market obj)
             {
-                int hCode = 31 ^ obj.Player1.Name[0]*4 ^ obj.Player2.Name[0]*5 ^
-                            obj.Player1.Name[0]*2 ^ obj.Player2.Name[0]*3;
+                if (obj.MarketName == null) return 1;
+                int hCode = 31 ^ obj.MarketName[0]*4 ^ obj.MarketName[1]*5;
+                if (obj.Player1.Name != null)
+                {
+                    hCode += obj.Player1.Name[0]*obj.Player1.Name[1] * obj.Player2.Name[2];
+                }
+                if (obj.Player2.Name != null)
+                {
+                    hCode += obj.Player2.Name[0] * obj.Player2.Name[1] * obj.Player2.Name[2];
+                }
                 return hCode;
             }
         }

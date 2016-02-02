@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Tennis_Betfair.Events;
+using Tennis_Betfair.TO;
 
 namespace Tennis_Betfair
 {
     public class Player : INotifyPropertyChanged
     {
 
-        private readonly string name;
+        private string name;
 
         private long _dateTimeBetfair;
         private long _dataTime365;
@@ -22,8 +24,21 @@ namespace Tennis_Betfair
 
         private string scoreNew;
 
-        public string Name => name;
+        private string prevScoreBetfair;
+        private string prevScore365;
+        private string prevNew;
+        private bool isFirst = true;
 
+        private DateTime prevDate365;
+
+        public event PlayerUpdateHandler PlayerHanlder;
+        public delegate void PlayerUpdateHandler(PlayerScoreUpdEventArgs scoreUpdEventArgs);
+
+        public string Name
+        {
+            get { return name; }
+            set { name = value; }
+        }
 
         public string ScoreBetfair1
         {
@@ -34,11 +49,11 @@ namespace Tennis_Betfair
                 int integ = 0;
                 if (!int.TryParse(value, out integ))
                 {
-                    updateScore("Adv");
-                    scoreBet365 = "Adv";
+                    scoreBetfair = "Adv";
+                    PlayerHanlder?.Invoke(new PlayerScoreUpdEventArgs("Adv", TypeDBO.BetFair));
                     return;
                 }
-                updateScore(value);
+                PlayerHanlder?.Invoke(new PlayerScoreUpdEventArgs(value, TypeDBO.BetFair));
                 scoreBetfair = value;
                
             }
@@ -53,11 +68,11 @@ namespace Tennis_Betfair
                 int integ = 0;
                 if (!int.TryParse(value,out integ))
                 {
-                    updateScore("Adv");
                     scoreBet365 = "Adv";
+                    PlayerHanlder?.Invoke(new PlayerScoreUpdEventArgs("Adv", TypeDBO.Bet365));
                     return;
                 }
-                updateScore(value);
+                PlayerHanlder?.Invoke(new PlayerScoreUpdEventArgs(value, TypeDBO.Bet365));
                 scoreBet365 = value;
 
             }
@@ -68,7 +83,7 @@ namespace Tennis_Betfair
             get { return scoreNew; }
         }
 
-        private int scoreComparator(string sr1, string sr2)
+        public static int scoreComparator(string sr1, string sr2)
         {
             if (toIntScore(sr1) > toIntScore(sr2))
                 return 1;
@@ -78,7 +93,7 @@ namespace Tennis_Betfair
                 return -1;
         }
 
-        private int toIntScore(string sr1)
+        public static int toIntScore(string sr1)
         {
             switch (sr1)
             {
@@ -93,17 +108,60 @@ namespace Tennis_Betfair
                 case "Adv":
                     return 50;
                 default:
-                    return -1;
+                    return 0;
 
             }
         }
-
-        private void updateScore(string valueScore)
+        /*
+        private void updateScore(string valueScore,int marketNumber)
         {
-            scoreNew = scoreComparator(scoreBet365, ScoreBetfair1) > 0
-                    ? scoreBet365 : ScoreBetfair1;
-        }
 
+
+            switch (marketNumber)
+            {
+                case 1:
+                    if (isFirst)
+                    {
+                        scoreNew = valueScore;
+                        prevNew = valueScore;
+                        isFirst = false;
+                    }
+                    if (!valueScore.Equals(prevNew))
+                    {
+                        Debug.WriteLine("Update Score: " + valueScore + " prev: " + prevNew + " Betfair");
+                        if ((Math.Abs(toIntScore(prevNew) - toIntScore(valueScore)) > 16) 
+                            && (toIntScore(valueScore) != 0)) return;
+
+                        prevNew = valueScore;
+                        scoreNew = valueScore;
+                        
+                    }
+                    break;
+                case 2:
+                    if (isFirst)
+                    {
+                        scoreNew = valueScore;
+                        prevNew = valueScore;
+                        isFirst = false;
+                    }
+                    if (!valueScore.Equals(prevNew))
+                    {
+                        Debug.WriteLine("Update Score: " + valueScore + " prev: " + prevNew + " Score365");
+                        /*if ((toIntScore(prevScore365) > toIntScore(valueScore))
+                            && ((toIntScore(prevScore365) != 50) && toIntScore(valueScore) != 0))
+                            return;*/
+          /*              if ((Math.Abs(toIntScore(prevNew) - toIntScore(valueScore)) > 16)
+                             && (toIntScore(valueScore) != 0)) return;
+
+                        prevNew = valueScore;
+                        scoreNew = valueScore;
+                    }
+                    break;
+            }
+            /*if (scoreBet365 != " : ") scoreNew = scoreBet365;
+            else scoreNew = scoreBetfair;*/
+        /*}
+*/
         public Player(string name, string score, bool isBetfair)
         {
             this.name = name;

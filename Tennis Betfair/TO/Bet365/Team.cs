@@ -17,6 +17,11 @@ namespace Tennis_Betfair.TO.Bet365
             this.score = score;
         }
 
+        public Team()
+        {
+            
+        }
+
         public String getName()
         {
             return name;

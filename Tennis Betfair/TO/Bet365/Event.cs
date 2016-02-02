@@ -12,6 +12,13 @@ namespace Tennis_Betfair.TO.Bet365
         private  String competitionType;
         private  Team team1;
         private  Team team2;
+        private bool isClose;
+
+        public bool IsClose
+        {
+            get { return isClose; }
+            set { isClose = value; }
+        }
 
         public Event(String eventID, String competitionType, Team team1, Team team2)
         {

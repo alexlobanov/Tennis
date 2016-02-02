@@ -85,8 +85,9 @@ namespace Tennis_Betfair.DBO.ParserBet365
                     var eventInfo = GetTennisEventInformation(match);
                     if (eventInfo == null)
                     {
+                        eventInfo = new Event(null,null,new Team(),new Team());
+                        eventInfo.IsClose = true;
                         Debug.WriteLine("Finnishd");
-                        continue;
                     }
                     eventsList.Add(eventInfo);
                 }
