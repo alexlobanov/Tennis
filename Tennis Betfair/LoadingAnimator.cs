@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Tennis_Betfair.Properties;
 
@@ -14,11 +9,10 @@ namespace Tennis_Betfair
     public static class LoadingAnimator
     {
         private static bool isAnimate;
-        private delegate void PaintControlEventHandler(object sender);
         private static Control control;
 
         /// <summary>
-        /// Initializes the static variables defined.
+        ///     Initializes the static variables defined.
         /// </summary>
         static LoadingAnimator()
         {
@@ -27,7 +21,12 @@ namespace Tennis_Betfair
         }
 
         /// <summary>
-        /// Wires the control with the loading indicator and starts the animation.
+        ///     Gets or Sets Animated Image(with multiple frames).
+        /// </summary>
+        public static Image Image { get; set; }
+
+        /// <summary>
+        ///     Wires the control with the loading indicator and starts the animation.
         /// </summary>
         /// <param name="ctrl">Any UI Control that requires long running operations to perform.</param>
         public static void Wire(Control ctrl)
@@ -39,7 +38,7 @@ namespace Tennis_Betfair
         }
 
         /// <summary>
-        /// Unwires the control from the loading indicator and stops the animation.
+        ///     Unwires the control from the loading indicator and stops the animation.
         /// </summary>
         /// <param name="ctrl">Any UI Control that requires long running operations to perform.</param>
         public static void UnWire(Control ctrl)
@@ -48,7 +47,7 @@ namespace Tennis_Betfair
             isAnimate = false;
         }
 
-        public static void UnWire(Control ctrl,int sleepBeforeUnWire)
+        public static void UnWire(Control ctrl, int sleepBeforeUnWire)
         {
             control = ctrl;
             Thread.Sleep(sleepBeforeUnWire);
@@ -56,41 +55,32 @@ namespace Tennis_Betfair
         }
 
         /// <summary>
-        /// Gets or Sets Animated Image(with multiple frames).
-        /// </summary>
-        public static Image Image
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// A method that initiates the loading animation.
+        ///     A method that initiates the loading animation.
         /// </summary>
         private static void AnimateLoading()
         {
-            ImageAnimator.Animate(Image, new EventHandler(RaiseControlPaint));
+            ImageAnimator.Animate(Image, RaiseControlPaint);
         }
 
         /// <summary>
-        /// A method that paints the loading indicator over the wired control.
+        ///     A method that paints the loading indicator over the wired control.
         /// </summary>
         /// <param name="sender">Wired Control.</param>
         private static void PaintControl(object sender)
         {
-            Control ctrl = sender as Control;
+            var ctrl = sender as Control;
             if (isAnimate)
             {
-                using (Graphics gr = ctrl.CreateGraphics())
+                using (var gr = ctrl.CreateGraphics())
                 {
                     ImageAnimator.UpdateFrames(Image);
-                    gr.DrawImage(Image, new Point(ctrl.Bounds.Width / 2, ctrl.Bounds.Height / 2));
+                    gr.DrawImage(Image, new Point(ctrl.Bounds.Width/2, ctrl.Bounds.Height/2));
                 }
             }
         }
 
         /// <summary>
-        /// A method that invokes the loading animation aside during long running operation in wired control.
+        ///     A method that invokes the loading animation aside during long running operation in wired control.
         /// </summary>
         /// <param name="o">sender</param>
         /// <param name="e">event argument</param>
@@ -100,8 +90,8 @@ namespace Tennis_Betfair
             {
                 if (control.InvokeRequired)
                 {
-                    PaintControlEventHandler handler = new PaintControlEventHandler(PaintControl);
-                    IAsyncResult result = handler.BeginInvoke(control, null, null);
+                    PaintControlEventHandler handler = PaintControl;
+                    var result = handler.BeginInvoke(control, null, null);
                     handler.EndInvoke(result);
                 }
                 else
@@ -110,5 +100,7 @@ namespace Tennis_Betfair
                 }
             }
         }
+
+        private delegate void PaintControlEventHandler(object sender);
     }
 }

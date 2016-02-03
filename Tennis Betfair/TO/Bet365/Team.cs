@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Tennis_Betfair.TO.Bet365
+﻿namespace Tennis_Betfair.TO.Bet365
 {
     public class Team
     {
-        private String name;
-        private String score;
+        private readonly string name;
+        private readonly string score;
 
-        public Team(String name, String score)
+        public Team(string name, string score)
         {
             this.name = name;
             this.score = score;
@@ -19,15 +13,14 @@ namespace Tennis_Betfair.TO.Bet365
 
         public Team()
         {
-            
         }
 
-        public String getName()
+        public string getName()
         {
             return name;
         }
 
-        public String getScore()
+        public string getScore()
         {
             return score;
         }

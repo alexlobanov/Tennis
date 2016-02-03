@@ -657,9 +657,9 @@ namespace Tennis_Betfair
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(703, 576);
+            this.Controls.Add(this.Closed);
             this.Controls.Add(this.label11);
             this.Controls.Add(this.label10);
-            this.Controls.Add(this.Closed);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.buttonAdv1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));

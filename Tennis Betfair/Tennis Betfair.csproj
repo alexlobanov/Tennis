@@ -33,24 +33,19 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Prince_of_tennis_favicon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\DevApi\bin\Debug\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="saxon9he-api, Version=9.6.0.8, Culture=neutral, PublicKeyToken=e1fdd002d5083fe6, processorArchitecture=MSIL">
-      <HintPath>..\packages\Saxon-HE.9.6.0.8\lib\net40\saxon9he-api.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="Syncfusion.Gauge.Windows, Version=13.4460.0.53, Culture=neutral, PublicKeyToken=3d67ed1f87d44c89, processorArchitecture=MSIL" />
     <Reference Include="Syncfusion.Shared.Base, Version=13.4460.0.53, Culture=neutral, PublicKeyToken=3d67ed1f87d44c89, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\13.4.0.53\Assemblies\4.6\Syncfusion.Shared.Base.dll</HintPath>
     </Reference>
-    <Reference Include="Syncfusion.Tools.Base, Version=13.4460.0.53, Culture=neutral, PublicKeyToken=3d67ed1f87d44c89" />
     <Reference Include="Syncfusion.Tools.Windows, Version=13.4460.0.53, Culture=neutral, PublicKeyToken=3d67ed1f87d44c89, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -87,7 +82,6 @@
     <Compile Include="DBO\ParserBet365\Connection.cs" />
     <Compile Include="DBO\ParserBet365\Parse.cs" />
     <Compile Include="DBO\Betfair.cs" />
-    <Compile Include="DBO\ParserBet365\ParseIndividualMatch.cs" />
     <Compile Include="Events\ChangedCheckEventArgs.cs" />
     <Compile Include="Events\LoadedEventArgs.cs" />
     <Compile Include="Events\MarketUpdEventArgs.cs" />
@@ -144,6 +138,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\loader-transparent.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Prince_of_tennis_favicon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

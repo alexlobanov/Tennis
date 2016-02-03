@@ -1,33 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Tennis_Betfair.Tennis;
-using ThreadState = System.Threading.ThreadState;
 
 namespace Tennis_Betfair.TO
 {
     public class ThreadScore
     {
-        private string betfairId;
+        private readonly AllMarkets allMarkets;
+        private readonly Thread threadBetfair;
+
+        private readonly Thread threadScore365;
         private string bet365Id;
+        private string betfairId;
+
+        private int countUpdate;
+        private bool isPosibleStop365;
+
+        private bool isPosibleStopBet;
 
         private bool isStop;
 
-        private Thread threadScore365;
-        private Thread threadBetfair;
-
         private ThreadStatus status;
 
-        private AllMarkets allMarkets;
-
-        private int countUpdate;
-
-        private bool isPosibleStopBet;
-        private bool isPosibleStop365;
         public ThreadScore(string betfairId, string bet365Id, ref AllMarkets allMarkets)
         {
             this.betfairId = betfairId;
@@ -89,19 +84,17 @@ namespace Tennis_Betfair.TO
         }
 
 
-
-
         public void UpdateEventId()
         {
-            int countErrors = 0;
+            var countErrors = 0;
             try
             {
-                HashSet<Market> hashset = new HashSet<Market>();
+                var hashset = new HashSet<Market>();
                 hashset = allMarkets.AllMarketsHashSet;
                 foreach (var market in hashset)
                 {
-                    if ((market.Bet365EventId == this.bet365Id)
-                        || (market.BetfairEventId == this.betfairId))
+                    if ((market.Bet365EventId == bet365Id)
+                        || (market.BetfairEventId == betfairId))
                     {
                         if (market.IsClose)
                         {
@@ -111,10 +104,10 @@ namespace Tennis_Betfair.TO
                                 isStop = true;
                             }
                         }
-                        if (this.bet365Id == null)
-                            this.bet365Id = market.Bet365EventId;
-                        if (this.betfairId == null)
-                            this.betfairId = market.BetfairEventId;
+                        if (bet365Id == null)
+                            bet365Id = market.Bet365EventId;
+                        if (betfairId == null)
+                            betfairId = market.BetfairEventId;
                     }
                 }
                 countErrors = 0;
@@ -127,18 +120,17 @@ namespace Tennis_Betfair.TO
             }
         }
 
-       
 
         private void GetScoreBetfair(object eventId)
         {
-            int count = 0;
+            var count = 0;
             while (true)
             {
-                bool result = false;
+                var result = false;
                 UpdateEventId();
                 if (isStop) return;
-                if ((string)eventId != null)
-                    result = allMarkets.GetScoreMarket((string)eventId, true);
+                if ((string) eventId != null)
+                    result = allMarkets.GetScoreMarket((string) eventId, true);
                 if (result)
                 {
                     Thread.Sleep(350);
@@ -157,14 +149,14 @@ namespace Tennis_Betfair.TO
 
         private void GetScore365(object eventId)
         {
-            int count = 0;
+            var count = 0;
             while (true)
             {
-                bool result = false;
+                var result = false;
                 UpdateEventId();
                 if (isStop) return;
-                if ((string)eventId != null)
-                    result = allMarkets.GetScoreMarket((string)eventId, false);
+                if ((string) eventId != null)
+                    result = allMarkets.GetScoreMarket((string) eventId, false);
                 if (result)
                 {
                     Thread.Sleep(350);
@@ -180,6 +172,5 @@ namespace Tennis_Betfair.TO
                     isStop = true;
             }
         }
-
     }
 }
