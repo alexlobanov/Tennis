@@ -87,9 +87,10 @@ namespace Tennis_Betfair
             var newScore = Player1.ScoreBetfair1 + " : " + Player2.ScoreBetfair1;
             if ((_prevBetfairScore == null) || (!_prevBetfairScore.Equals(newScore)) || _prevBetfairScore == " : ")
             {
-                if (((DateTime.Now.CompareTo(_betfairSpan.AddSeconds(2)) <= 0)) || _betfairSpan == DateTime.MinValue)
+                Debug.WriteLine("[Betfair] " + newScore);
+                if ((!(DateTime.Now.CompareTo(_betfairSpan.AddSeconds(2)) <= 0)) || _betfairSpan == DateTime.MinValue)
                 {
-                    Debug.WriteLine("[Betfair] " + newScore);
+                  
                     _betfairSpan = DateTime.Now;
                     _prevBetfairScore = Player1.ScoreBetfair1 + " : " + Player2.ScoreBetfair1;
                 }
@@ -102,10 +103,11 @@ namespace Tennis_Betfair
             var newScore = Player1.ScoreBet366 + " : " + Player2.ScoreBet366;
             if ((_prevBet365Score == null) || (!_prevBet365Score.Equals(newScore)) || _prevBet365Score == " : ")
             {
+                Debug.WriteLine("[Bet365] " + newScore);
                 if ((!(DateTime.Now.CompareTo(_bet365Span.AddSeconds(2)) <= 0))
                     || (_bet365Span == DateTime.MinValue))
                 {
-                    Debug.WriteLine("[Bet365] " + newScore);
+                  //  Debug.WriteLine("[Bet365] " + newScore);
                     _bet365Span = DateTime.Now;
                     _prevBet365Score = Player1.ScoreBet366 + " : " + Player2.ScoreBet366;
                 }
