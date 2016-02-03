@@ -5,8 +5,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Tennis_Betfair.Events;
+using Tennis_Betfair.Tennis;
 using Tennis_Betfair.TO;
 
 namespace Tennis_Betfair
@@ -40,6 +42,10 @@ namespace Tennis_Betfair
         private string prevBetfairScore;
         private string prevBet365Score;
         private string prevNewScore;
+
+
+        public static event LoadedEventHandler LoadedEvent;
+        public delegate void LoadedEventHandler(LoadedEventArgs loadedEvent);
         public string ScoreBetOne
         {
             get
@@ -87,10 +93,6 @@ namespace Tennis_Betfair
             set { isClose = value; }
         }
 
-       
-
-
-
         public string MarketName
         {
             get { return marketName; }
@@ -119,13 +121,14 @@ namespace Tennis_Betfair
         public string GetBetFairScore()
         {
             var newScore = player1.ScoreBetfair1 + " : " + player2.ScoreBetfair1;
-            if ((prevBetfairScore == null) || (!prevBetfairScore.Equals(newScore)))
+            if ((prevBetfairScore == null) || (!prevBetfairScore.Equals(newScore)) || prevBetfairScore == " : ")
             {
-                if (!(DateTime.Now.CompareTo(betfairSpan.AddSeconds(2)) <= 0))
+                if (((DateTime.Now.CompareTo(betfairSpan.AddSeconds(2)) <= 0))|| betfairSpan == DateTime.MinValue)
                 {
                     Debug.WriteLine("[Betfair] " + newScore);
                     betfairSpan = DateTime.Now;
                     prevBetfairScore = player1.ScoreBetfair1 + " : " + player2.ScoreBetfair1;
+                    isFirstUpdScoreTwo = false;
                 }
             }
             return player1.ScoreBetfair1 + " : " + player2.ScoreBetfair1;
@@ -134,13 +137,15 @@ namespace Tennis_Betfair
         public string GetBet365Score()
         {
             var newScore = player1.ScoreBet366 + " : " + player2.ScoreBet366;
-            if ((prevBet365Score == null) || (!prevBet365Score.Equals(newScore)))
+            if ((prevBet365Score == null) || (!prevBet365Score.Equals(newScore)) || prevBet365Score == " : ")
             {
-                if (!(DateTime.Now.CompareTo(bet365Span.AddSeconds(2)) <= 0))
+                if ((!(DateTime.Now.CompareTo(bet365Span.AddSeconds(2)) <= 0)) 
+                    || (bet365Span == DateTime.MinValue))
                 {
                     Debug.WriteLine("[Bet365] " + newScore);
                     bet365Span = DateTime.Now;
                     prevBet365Score = player1.ScoreBet366 + " : " + player2.ScoreBet366;
+                    isFirstUpdScoreOne = false;
                 }
             }
             return player1.ScoreBet366 + " : " + player2.ScoreBet366;
@@ -149,14 +154,11 @@ namespace Tennis_Betfair
         public string GetNewScore()
         {
             string result = "";
-
-            // if ((bet365Span.CompareTo(betfairSpan) > 0) && (validate(prevNewScore,prevBet365Score)))
             if ((bet365Span.CompareTo(betfairSpan) > 0))
             {
                 result = prevBet365Score;
                 prevNewScore = prevBet365Score;
             }
-            // else if ((bet365Span.CompareTo(betfairSpan) < 0) && (validate(prevNewScore, prevBetfairScore)))
             else if ((bet365Span.CompareTo(betfairSpan) < 0))
             {
                 result = prevBetfairScore;
@@ -167,6 +169,20 @@ namespace Tennis_Betfair
                 result = prevNewScore;
             }
             else result = "0 : 0";
+            var scores = result.Split();
+            if (scores.Count() == 3)
+            {
+                scoreNewOne = scores[0].Trim();
+                scoreNewTwo = scores[2].Trim();
+            }
+            if (result == " : ")
+            {
+               var elem1 = GetBet365Score();
+               var elem2 = GetBetFairScore();
+                if (elem1 != " : ")
+                    return elem1;
+                else return elem2;
+            }
             return result;
         }
 
@@ -192,21 +208,16 @@ namespace Tennis_Betfair
             MarketChanged?.Invoke(new MarketUpdEventArgs(this));
         }
 
-        private string oneBetfait;
-        private string twoBetfair;
-        private string one365;
-        private string two365;
+
         private int countUpdate = 0;
         private void Player2OnPlayerHanlder(PlayerScoreUpdEventArgs scoreUpdEventArgs)
         {
             switch (scoreUpdEventArgs.TypeEx)
             {
                 case TypeDBO.BetFair:
-                    twoBetfair = scoreUpdEventArgs.Score;
                     UpdateScore(scoreUpdEventArgs.Score, 2);
                 break;
                 case TypeDBO.Bet365:
-                    two365 = twoBetfair = scoreUpdEventArgs.Score;
                     UpdateScore(scoreUpdEventArgs.Score, 2);
                 break;
             }
@@ -217,70 +228,16 @@ namespace Tennis_Betfair
             switch (scoreUpdEventArgs.TypeEx)
             {
                 case TypeDBO.BetFair:
-                    oneBetfait = twoBetfair = scoreUpdEventArgs.Score;
                     UpdateScore(scoreUpdEventArgs.Score, 1);
                     break;
                 case TypeDBO.Bet365:
-                    one365 = twoBetfair = scoreUpdEventArgs.Score;;
-                    UpdateScore(scoreUpdEventArgs.Score, 1);
+                   UpdateScore(scoreUpdEventArgs.Score, 1);
                     break;
             }
 
         }
 
 
-
-       /* private bool validate(string prevScore, string newScore)
-        {
-            if (prevScore == null) return false;
-            if ((newScore == "0:0") && (prevScore == "0:Adv")) return true;
-            if ((newScore == "0:0") && (prevScore == "15:Adv")) return true;
-            if ((newScore == "0:0") && (prevScore == "30:Adv")) return true;
-            if ((newScore == "0:0") && (prevScore == "40:Adv")) return true;
-
-            if ((newScore == "0:0") && (prevScore == "Adv:0")) return true;
-            if ((newScore == "0:0") && (prevScore == "Adv:15")) return true;
-            if ((newScore == "0:0") && (prevScore == "Adv:30")) return true;
-            if ((newScore == "0:0") && (prevScore == "Adv:40")) return true;
-
-
-            if ((newScore == "15:0") && (prevScore == "0:0")) return true;
-            if ((newScore == "30:0") && (prevScore == "15:0")) return true;
-            if ((newScore == "40:0") && (prevScore == "30:0")) return true;
-            if ((newScore == "Adv:0") && (prevScore == "40:0")) return true;
-            if ((newScore == "40:0") && (prevScore == "Adv:0")) return true;
-
-            if ((newScore == "0:15") && (prevScore == "0:0")) return true;
-            if ((newScore == "0:30") && (prevScore == "0:15")) return true;
-            if ((newScore == "0:40") && (prevScore == "0:40")) return true;
-            if ((newScore == "0:40") && (prevScore == "0:Adv")) return true;
-            if ((newScore == "0:Adv") && (prevScore == "0:40")) return true;
-
-            if ((newScore == "15:15") && (prevScore == "0:0")) return true;
-            if ((newScore == "15:30") && (prevScore == "0:15")) return true;
-            if ((newScore == "15:40") && (prevScore == "0:30")) return true;
-            if ((newScore == "15:Adv") && (prevScore == "0:40")) return true;
-            if ((newScore == "15:40") && (prevScore == "0:Adv")) return true;
-
-            if ((newScore == "30:15") && (prevScore == "15:0")) return true;
-            if ((newScore == "30:30") && (prevScore == "15:15")) return true;
-            if ((newScore == "30:40") && (prevScore == "15:30")) return true;
-            if ((newScore == "30:Adv") && (prevScore == "15:40")) return true;
-            if ((newScore == "30:40") && (prevScore == "15:Adv")) return true;
-
-            if ((newScore == "40:15") && (prevScore == "30:0")) return true;
-            if ((newScore == "40:30") && (prevScore == "30:15")) return true;
-            if ((newScore == "40:40") && (prevScore == "30:30")) return true;
-            if ((newScore == "40:Adv") && (prevScore == "30:40")) return true;
-            if ((newScore == "40:40") && (prevScore == "30:Adv")) return true;
-
-            if ((newScore == "40:15") && (prevScore == "30:0")) return true;
-            if ((newScore == "40:30") && (prevScore == "30:15")) return true;
-            if ((newScore == "40:40") && (prevScore == "30:30")) return true;
-            if ((newScore == "40:Adv") && (prevScore == "30:40")) return true;
-            if ((newScore == "40:40") && (prevScore == "30:Adv")) return true;
-            return false;
-        }*/
 
         public void updateFirstScore()
         {
@@ -289,84 +246,8 @@ namespace Tennis_Betfair
         }
         private void UpdateScore(string score, int player)
         {
-           /* switch (player)
-            {
-                    
-            }
-            if (betfairSpan.CompareTo(bet365Span) > 0)
-            {
-                scoreNewOne    
-            }*/
-
-            /*
-            switch (player)
-            {
-                case 1:
-
-                    if (isFirstUpdScoreOne)
-                    {
-                        isFirstUpdScoreOne = false;
-                        scoreNewPrevOne = score;
-                        scoreNewOne = score;
-                        return;
-                    }
-                    if (!score.Equals(scoreNewPrevOne))
-                    {
-                        if (!validate(scoreNewPrevOne, score)) return;
-                        Debug.WriteLine("Date:" + DateTime.Now.ToShortTimeString() + "[1Player] score: " + score);
-                        scoreNewOne = score;
-                        scoreNewPrevOne = score;
-                    }
-                    break;
-                case 2:
-
-                    if (isFirstUpdScoreTwo)
-                    {
-                        isFirstUpdScoreTwo = false;
-                        scoreNewPrevTwo = score;
-                        scoreNewTwo = score;
-                        return;
-                    }
-                    if (!score.Equals(scoreNewPrevTwo))
-                    {
-                        if (!validate(scoreNewPrevOne, score)) return;
-                        Debug.WriteLine("Date:" + DateTime.Now.ToShortTimeString() + "[2Player] score: " + score);
-                        scoreNewPrevTwo = score;
-                        scoreNewTwo = score;
-                    }
-                    break;
-            }*/
+          
         }
-
-        /*
-        private bool validateScore(string prevScore,string newScoreOnet, string newScoreTwo, int player)
-        {
-            switch ()
-            {
-                case "0":
-                    break;
-                case "15":
-                    break;
-                case "30":
-
-                    break;
-                case "40":
-
-                    break;
-                case "Adv":
-
-                    break;
-            }
-            switch (player)
-            {
-                case 1:
-                    
-                    break;
-                case 2:
-
-                    break;
-            }
-        }*/
 
 
         public override string ToString()

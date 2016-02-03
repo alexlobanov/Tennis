@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Tennis_Betfair.Properties;
@@ -44,6 +45,13 @@ namespace Tennis_Betfair
         public static void UnWire(Control ctrl)
         {
             control = ctrl;
+            isAnimate = false;
+        }
+
+        public static void UnWire(Control ctrl,int sleepBeforeUnWire)
+        {
+            control = ctrl;
+            Thread.Sleep(sleepBeforeUnWire);
             isAnimate = false;
         }
 

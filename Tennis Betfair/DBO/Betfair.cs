@@ -77,7 +77,7 @@ namespace Tennis_Betfair.DBO
                 var reader = new StreamReader(stream);
                 gata =
                     JsonConvert.DeserializeObject<List<GetScore>>(reader.ReadLine());
-               
+                
             }
             else
             {

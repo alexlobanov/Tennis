@@ -8,6 +8,7 @@
 using System;
 using Tennis_Betfair.DBO;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
@@ -20,6 +21,7 @@ using Tennis_Betfair.DBO.ParserBet365;
 using Tennis_Betfair.Events;
 using Tennis_Betfair.Tennis;
 using Tennis_Betfair.TO;
+using LoadedEventArgs = Tennis_Betfair.Events.LoadedEventArgs;
 using ThreadState = System.Threading.ThreadState;
 
 namespace Tennis_Betfair
@@ -30,10 +32,8 @@ namespace Tennis_Betfair
         /*Events*/
         public static event ChangedCheckHandler CheckChange;
         public delegate void ChangedCheckHandler(ChangedCheckEventArgs checkEvent);
-
-        public static event UnCheckHandler UnCheck;
-        public delegate void UnCheckHandler(UnCheckEventsArgs unCheckEvent);
         /*End Events*/
+
         private volatile int toClickIndex;
 
         private int prevClickScore;
@@ -55,12 +55,37 @@ namespace Tennis_Betfair
             _allMarkets = new AllMarkets();
             Market.MarketChanged += OnMarketChangedEvent;
             AllMarkets.playerChanged += OnPlayerChanged;
+            AllMarkets.LoadedEvent += OnLoadedEvent;
+
             UiThread = new Thread(Start);
             UiThread.Name = "UiThread";
             UiThread.Start();
             isStop = false;
-           /* Closed.Nodes.Add(new TreeNodeAdv("Closed markets"));
-            Closed.Nodes.Add(new TreeNodeAdv("Open markets"));*/
+         
+        }
+
+        private void OnLoadedEvent(LoadedEventArgs loadedEvent)
+        {
+            var thread = new Thread(() =>
+            {
+                if (loadedEvent.LoadedStarted)
+                {
+                    if (InvokeRequired)
+                        panel1.Invoke(new System.Action(() => { panel1.Visible = false; }));
+                    else
+                        panel1.Visible = false;
+                    LoadingAnimator.Wire(panel2);
+                }
+                if (loadedEvent.LoadedEnded)
+                {
+                    if (InvokeRequired)
+                        panel1.Invoke(new System.Action(() => { panel1.Visible = true; }));
+                    else
+                        panel1.Visible = true;
+                    LoadingAnimator.UnWire(panel2);
+                }
+            });
+            thread.Start();
         }
 
         private void Start()
@@ -76,6 +101,10 @@ namespace Tennis_Betfair
                         Thread.Sleep(1000);
                         continue;
                     }
+                    label11.Invoke(new System.Action(() =>
+                    {
+                        label11.Text = Closed.Nodes.Count.ToString();
+                    }));
                     textBoxExt5.Invoke(new System.Action(() =>
                     {
                        getStateThread(elem);
@@ -84,29 +113,14 @@ namespace Tennis_Betfair
                     {
                         radioButtonAdv1.Invoke(new System.Action(() =>
                         {
+                         
                             var parse = e_prev.Node.Text.Split(':');
-                           
-                            if (parse.Count() < 2) 
-                            {
-                                Thread.Sleep(1000);
-                                return;
-                            }
 
-                            var treeName = parse[0].Trim() + ":" + parse[1].Trim();
-                            var isContains = false;
-                            for (int i = 0; i < Closed.Nodes[0].GetNodeCount(false); i++)
-                            {
-                                if (Closed.Nodes[0].Nodes[i].Text.Equals(treeName))
-                                    isContains = true;
-                            }
-                            if (isContains)
+                            if (parse.Count() < 2)
                             {
                                 Thread.Sleep(1000);
                                 return;
                             }
-                            Closed.Nodes[1].Nodes.Remove(e_prev.Node);
-                            Closed.Nodes[0].Nodes.Add(
-                                new TreeNodeAdv(parse[0].Trim() + ":" + parse[1].Trim()));
                             radioButtonAdv1.Text = parse[0].Trim();
                             radioButtonAdv2.Text = parse[1].Trim();
                             textBoxExt7.Text = parse[0].Trim();
@@ -139,12 +153,12 @@ namespace Tennis_Betfair
 
                     textBoxExt7.Text = marketArgs.ChangetMarket.Player1.Name;
                     textBoxExt8.Text = marketArgs.ChangetMarket.Player2.Name;
-
+                    var one = marketArgs.ChangetMarket.GetBetFairScore();
+                    var two = marketArgs.ChangetMarket.GetBet365Score();
                     digitalGauge1.Value = marketArgs.ChangetMarket.GetNewScore();
                     textBoxExt3.Text = marketArgs.ChangetMarket.MarketName;
 
-                    var one = marketArgs.ChangetMarket.GetBetFairScore();
-                    var two = marketArgs.ChangetMarket.GetBet365Score();
+                   
 
                     switch (one)
                     {
@@ -274,18 +288,18 @@ namespace Tennis_Betfair
 
         private void OnMarketChangedEvent(MarketUpdEventArgs eventArgs)
         {
-              var gameStr = eventArgs.ChangetMarket.Player1.Name +
-                       "  :  " + eventArgs.ChangetMarket.Player2.Name;
-              var isHaveElem = false;
+            var gameStr = eventArgs.ChangetMarket.Player1.Name +
+                    "  :  " + eventArgs.ChangetMarket.Player2.Name;
+            var isHaveElem = false;
             if (eventArgs.ChangetMarket.Player1.Name == null) return;
-            for (var j = 0; j < Closed.Nodes[1].Nodes.Count; j++)
+            for (var j = 0; j < Closed.Nodes.Count; j++)
             {
-                if (Closed.Nodes[1].Nodes[j].Text.Equals(gameStr))
+                if (Closed.Nodes[j].Text.Equals(gameStr))
                     isHaveElem = true;
             }
             if (!isHaveElem)
             {
-                Closed.Nodes[1].Nodes?.Add(new TreeNodeAdv(gameStr));
+                Closed.Nodes?.Add(new TreeNodeAdv(gameStr));
               
             }
         }
@@ -296,8 +310,7 @@ namespace Tennis_Betfair
 
         private void buttonAdv1_Click(object sender, EventArgs e)
         {
-            panel1.Visible = false;
-            LoadingAnimator.Wire(panel2);
+          
             if ((_allMarkets?.GetStatus() != null))
             {
                 _allMarkets.StopThreads();
@@ -311,8 +324,7 @@ namespace Tennis_Betfair
                 treeViewAdv1_NodeMouseClick(null, e_prev);
             }
             //LoadingAnimator.UnWire(treeViewAdv1);
-            LoadingAnimator.UnWire(panel2);
-            panel1.Visible = true;
+           
         }
  
 
@@ -327,35 +339,29 @@ namespace Tennis_Betfair
             }
             panel1.Visible = false;
             LoadingAnimator.Wire(panel2);
-            e_prev = e;
-            TreeNodeAdv tree;
-           
+            e_prev = e;           
             var players = e.Node.Text.Split(':');
             var player1Node = players[0].Trim();
             var player2Node = players[1].Trim();
             foreach (var market in _allMarkets.AllMarketsHashSet)
             {
                 //*Check event*/
-                if ((market.Player1.Name == player1Node) 
-                    || (market.Player2.Name == player2Node))
-                {
-                    var eventIdBetfair = market.BetfairEventId;
-                    var eventId365 = market.Bet365EventId;
-                    if ((eventIdBetfair == null) && (eventId365 == null)) _allMarkets.AllMarketsHashSet.Remove(market);
+                if ((market.Player1.Name != player1Node) 
+                    && (market.Player2.Name != player2Node)) continue;
+                var eventIdBetfair = market.BetfairEventId;
+                var eventId365 = market.Bet365EventId;
+                if ((eventIdBetfair == null) && (eventId365 == null)) _allMarkets.AllMarketsHashSet.Remove(market);
 
-                    Debug.WriteLine("Event: " + eventId365 + " : " + eventIdBetfair);
+                Debug.WriteLine("Event: " + eventId365 + " : " + eventIdBetfair);
                  
-                    CheckChange?.Invoke(
-                        new ChangedCheckEventArgs(eventIdBetfair, eventId365)
-                        );
+                CheckChange?.Invoke(
+                    new ChangedCheckEventArgs(eventIdBetfair, eventId365)
+                    );
                     
-                    Debug.WriteLine("Ok-Invoke");                   
-                    break;
-                }
-
+                Debug.WriteLine("Ok-Invoke");                   
+                break;
             }
-            Thread.Sleep(1000);
-            LoadingAnimator.UnWire(panel2);
+            LoadingAnimator.UnWire(panel2,1700);
             panel1.Visible = true;
         }
 

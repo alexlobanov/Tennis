@@ -71,9 +71,6 @@ namespace Tennis_Betfair.TO
             }
         }
 
-    
-
-
         public void StartThreads()
         {
             threadScore365.Start(bet365Id);

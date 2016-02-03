@@ -20,8 +20,8 @@ namespace Tennis_Betfair.DBO.ParserBet365
     public class Parse
     {
         public static string BET365_HOME = "https://mobile.bet365.com";
-        private static String cook;
-        private static String homePage;
+        private String cook;
+        private String homePage;
         private List<string> hosts = new List<string>();
         private List<string> ports = new List<string>();
         private String clientRn;
@@ -37,7 +37,7 @@ namespace Tennis_Betfair.DBO.ParserBet365
         private int serverNum; 
 
         /*New*/
-        static CookieContainer Cookie = new CookieContainer();
+        CookieContainer Cookie = new CookieContainer();
         Uri CookieHostname = new Uri(BET365_HOME);
 
         public int GenerateRandom(int min, int max)

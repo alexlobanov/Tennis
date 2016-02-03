@@ -21,7 +21,8 @@ namespace Tennis_Betfair.Tennis
         private static object lockMarkets = new object();
         private Betfair betfair;
         private Bet365Class bet365Class;
-
+        private bool loadBetfair;
+        private bool loadbet365;
         private HashSet<Market> allMarkets;
 
         public HashSet<Market> AllMarketsHashSet
@@ -37,9 +38,18 @@ namespace Tennis_Betfair.Tennis
 
         public ThreadControl threadControl;
 
-
+        /// <summary>
+        /// Events start
+        /// </summary>
         public static event PlayerChanged playerChanged;
         public delegate void PlayerChanged(ScoreUpdEventArgs player);
+
+
+        public static event LoadedEventHandler LoadedEvent;
+        public delegate void LoadedEventHandler(LoadedEventArgs loadedEvent);
+        /// <summary>
+        /// Events end;
+        /// </summary>
 
         public AllMarkets()
         {
@@ -54,16 +64,19 @@ namespace Tennis_Betfair.Tennis
 
         public void StartThreads()
         {
-          
-                threadControl.Get365All();
-                threadControl.GetBetfairAll();
-      
-            //threadControl.StartThreads();
+           var thread = new Thread(() =>
+           {
+               LoadedEvent?.Invoke(new LoadedEventArgs(true, false));
+               threadControl.Get365All();
+               threadControl.GetBetfairAll();
+               LoadedEvent?.Invoke(new LoadedEventArgs(false, true));
+           });
+           thread.Start();
         }
 
         public void AbortThreads()
         {
-            
+            threadControl.AbortThreads();
         }
 
         public void MarketIgnore(int eventId)
@@ -81,7 +94,6 @@ namespace Tennis_Betfair.Tennis
             catch (Exception)
             {
                 return null;
-                /**/
             }
         }
 
@@ -118,14 +130,7 @@ namespace Tennis_Betfair.Tennis
             }
         }
 
-        public void GetAllMarkets()
-        {
-            var bet365All = bet365Class.GetInPlayAllMarkets();
-            var betfairAll = betfair.GetInPlayAllMarkets();
-
-            ParseDate(bet365All);
-            ParseDate(betfairAll);
-        }
+       
 
         public bool GetScoreMarket(string eventId, bool isBetfair)
         {
@@ -318,6 +323,12 @@ namespace Tennis_Betfair.Tennis
                             betfairSingleData[0].score.home.score;
                         allMarket.Player2.ScoreBetfair1 =
                             betfairSingleData[0].score.away.score;
+                        allMarket.Player2.Name =
+                            betfairSingleData[0].score.away.name;
+                        allMarket.Player1.Name =
+                            betfairSingleData[0].score.home.name;
+                        
+
                         if (betfairSingleData[0].matchStatus.ToLower() == "finished")
                             allMarket.IsClose = true;
                         playerChanged?.Invoke(new ScoreUpdEventArgs(allMarket));
@@ -350,6 +361,8 @@ namespace Tennis_Betfair.Tennis
                             b365SingleData.Team1.getScore();
                         allMarket.Player2.ScoreBet366 =
                             b365SingleData.Team2.getScore();
+                        allMarket.MarketName = b365SingleData.CompetitionType;
+                        
                         playerChanged?.Invoke(new ScoreUpdEventArgs(allMarket));
                     }
                 }

@@ -89,6 +89,7 @@
     <Compile Include="DBO\Betfair.cs" />
     <Compile Include="DBO\ParserBet365\ParseIndividualMatch.cs" />
     <Compile Include="Events\ChangedCheckEventArgs.cs" />
+    <Compile Include="Events\LoadedEventArgs.cs" />
     <Compile Include="Events\MarketUpdEventArgs.cs" />
     <Compile Include="Events\PlayerScoreUpdEventArgs.cs" />
     <Compile Include="Events\ScoreUpdEventArgs.cs" />
