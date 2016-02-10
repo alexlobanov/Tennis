@@ -13,50 +13,37 @@ namespace Tennis_Betfair
         public delegate void MarketChangedEventHandler(MarketUpdEventArgs market);
 
         private DateTime _bet365Span;
-
         private DateTime _betfairSpan;
+        private DateTime _skyBetSpan;
+
+        private string _prevSkybetScore;
         private string _prevBet365Score;
         private string _prevBetfairScore;
+
         private string _prevNewScore;
 
         public Market(string marketName, Player player1, Player player2,
-            string eventId, bool isBetfair)
+            string eventId, TypeDBO typeDbo)
         {
             MarketName = marketName;
             Player1 = player1;
             Player2 = player2;
-            if (isBetfair)
+            switch (typeDbo)
             {
-                BetfairEventId = eventId;
-            }
-            else
-            {
-                Bet365EventId = eventId;
-            }
+                    case TypeDBO.SkyBet:
+                        SkyBetEventId = eventId;
+                    break;
+                    case TypeDBO.Bet365:
+                        Bet365EventId = eventId;
+                    break;
+                    case TypeDBO.BetFair:
+                        BetfairEventId = eventId;
+                    break;
+            }     
             Player1.PlayerHanlder += Player1OnPlayerHanlder;
             Player2.PlayerHanlder += Player2OnPlayerHanlder;
 
             MarketChanged?.Invoke(new MarketUpdEventArgs(this));
-        }
-
-        public string ScoreBetOne
-        {
-            get { return Player1.ScoreBetfair1; }
-        }
-
-        public string ScoreBetTwo
-        {
-            get { return Player2.ScoreBetfair1; }
-        }
-
-        public string Score365One
-        {
-            get { return Player1.ScoreBet366; }
-        }
-
-        public string Score365Two
-        {
-            get { return Player2.ScoreBet366; }
         }
 
 
@@ -72,16 +59,22 @@ namespace Tennis_Betfair
 
         public Player Player2 { get; }
 
-
+        /*Event id*/
         public string BetfairEventId { get; set; }
 
         public string Bet365EventId { get; set; }
 
+        public string SkyBetEventId { get; set; }
+        /*End Event id*/
 
         public static event LoadedEventHandler LoadedEvent;
 
         public static event MarketChangedEventHandler MarketChanged;
 
+        /// <summary>
+        /// Получает строку со счётом с betfair
+        /// </summary>
+        /// <returns>Счёт с betfair</returns>
         public string GetBetFairScore()
         {
             var newScore = Player1.ScoreBetfair1 + " : " + Player2.ScoreBetfair1;
@@ -98,6 +91,12 @@ namespace Tennis_Betfair
             return Player1.ScoreBetfair1 + " : " + Player2.ScoreBetfair1;
         }
 
+     
+
+        /// <summary>
+        /// Получает строку со счётом с bet365
+        /// </summary>
+        /// <returns>Счёт</returns>
         public string GetBet365Score()
         {
             var newScore = Player1.ScoreBet366 + " : " + Player2.ScoreBet366;
@@ -107,13 +106,37 @@ namespace Tennis_Betfair
                 if ((!(DateTime.Now.CompareTo(_bet365Span.AddSeconds(2)) <= 0))
                     || (_bet365Span == DateTime.MinValue))
                 {
-                  //  Debug.WriteLine("[Bet365] " + newScore);
                     _bet365Span = DateTime.Now;
                     _prevBet365Score = Player1.ScoreBet366 + " : " + Player2.ScoreBet366;
                 }
             }
             return Player1.ScoreBet366 + " : " + Player2.ScoreBet366;
         }
+
+        /// <summary>
+        /// Получает строку со счётом с skybet
+        /// </summary>
+        /// <returns>Счёт</returns>
+        public string GetSkyBetScore()
+        {
+            var newScore = Player1.ScoreSkyBet + " : " + Player2.ScoreSkyBet;
+            if ((_prevSkybetScore == null) || (!_prevSkybetScore.Equals(newScore)) || _prevSkybetScore == " : ")
+            {
+                Debug.WriteLine("[Skybet] " + newScore);
+                if ((!(DateTime.Now.CompareTo(_skyBetSpan.AddSeconds(2)) <= 0))
+                    || (_skyBetSpan == DateTime.MinValue))
+                {
+                    _skyBetSpan = DateTime.Now;
+                    _prevSkybetScore = Player1.ScoreSkyBet + " : " + Player2.ScoreSkyBet;
+                }
+            }
+            return Player1.ScoreSkyBet + " : " + Player2.ScoreSkyBet;
+        }
+
+        /// <summary>
+        /// Итоговый счёт со всех бирж
+        /// </summary>
+        /// <returns>Счёт со всех бирж</returns>
 
         public string GetNewScore()
         {

@@ -19,34 +19,40 @@ namespace Tennis_Betfair.DBO
             if (rows == null) return null;
             var inplayMarkets = new List<MarketInfo>();
             markets = new List<MarketInfo>();
-            foreach (var row in rows)
+
+            var cells = rows[0].SelectNodes("./tr");
+            foreach (var cell in cells)
             {
-                var cells = row.SelectNodes("./tr");
-                var html = cells[0].InnerHtml;
+                var html = cell.InnerHtml;
+
+                if (!html.Contains("/tennis-live/event/"))
+                    continue;
                 var regexMathesEventId = Regex.Match(html, "(\\/)+([0-9]+)");
                 var regexNamePlayers = Regex.Match(html, "([>]*.*[v].*.[<])");
-                var eventId = regexMathesEventId.Value.Trim(new[] { '/' });
-                var players = regexNamePlayers.Value.Trim(new[] { ' ', '<' });
-
+                var eventId = regexMathesEventId.Value.Trim(new[] {'/'});
+                var players = regexNamePlayers.Value.Trim(new[] {' ', '<'});
                 var tmp = Regex.Match(players, "([A-z+-]\\w)+([A-z+-]*\\w)");
                 var player1 = "";
                 var player2 = "";
-                switch (tmp.Groups.Count)
+                if (players.Contains("/"))
                 {
-                    case 3:
-                        //two players in team
-                        var team1 = tmp.Value + '/' + tmp.NextMatch().Value;
-                        var team2 = tmp.NextMatch().NextMatch().Value + '/' + tmp.NextMatch().NextMatch().NextMatch().Value;
-                        player1 = team1;
-                        player2 = team2;
-                        break;
-                    case 1:
-                        //one player in team;
-                        player1 = tmp.Value;
-                        player2 = tmp.NextMatch().Value;
-                        break;
+                    //two players in team
+                    var team1 = tmp.Value + '/' + tmp.NextMatch().Value;
+                    var team2 = tmp.NextMatch().NextMatch().Value + '/' +
+                                tmp.NextMatch().NextMatch().NextMatch().Value;
+                    player1 = team1;
+                    player2 = team2;
                 }
-                inplayMarkets.Add(new MarketInfo(player1 + " : " + player2,player1,player2, eventId));
+                else
+                {
+                    //one player in team
+                    var team1 = tmp.Value + ' ' + tmp.NextMatch().Value;
+                    var team2 = tmp.NextMatch().NextMatch().Value + ' ' +
+                                tmp.NextMatch().NextMatch().NextMatch().Value;
+                    player1 = team1;
+                    player2 = team2;
+                }             
+                inplayMarkets.Add(new MarketInfo(player1 + " : " + player2, player1, player2, eventId));
             }
             markets = inplayMarkets;
             return inplayMarkets;
@@ -76,7 +82,7 @@ namespace Tennis_Betfair.DBO
                 }
             }
 
-            return new ScoreInfo(player1,player2,scoreFirstPlayer,scoreSecondPlayer);
+            return new ScoreInfo(player1,player2,scoreFirstPlayer,scoreSecondPlayer, eventIdSkyBet);
         } 
     }
 }

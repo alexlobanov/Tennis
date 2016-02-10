@@ -31,7 +31,7 @@ namespace Tennis_Betfair
         private readonly AllMarkets _allMarkets;
 
         private readonly Thread UiThread;
-
+        private readonly Thread CheckConnetionThread;
 
         private ChangedCheckEventArgs _prev;
 
@@ -58,10 +58,24 @@ namespace Tennis_Betfair
             AllMarkets.playerChanged += OnPlayerChanged;
             AllMarkets.LoadedEvent += OnLoadedEvent;
 
-            UiThread = new Thread(Start);
-            UiThread.Name = "UiThread";
+            UiThread = new Thread(Start) {Name = "UiThread"};
             UiThread.Start();
+
+            CheckConnetionThread = new Thread(CheckConnetion) {Name = "CheckStatus"};
+            CheckConnetionThread.Start();
             isStop = false;
+        }
+
+        private void CheckConnetion()
+        {
+            while (true)
+            {
+                if (isStop) return;
+                pictureBox365.Image = CheckInternetConenction.CheckConnection(TypeDBO.Bet365) ? Properties.Resources.green : Properties.Resources.red;
+                pictureBoxBF.Image = CheckInternetConenction.CheckConnection(TypeDBO.BetFair) ? Properties.Resources.green : Properties.Resources.red;
+                pictureBoxSB.Image = CheckInternetConenction.CheckConnection(TypeDBO.SkyBet) ? Properties.Resources.green : Properties.Resources.red;
+                Thread.Sleep(60000);
+            }
         }
 
         /*Events*/
@@ -106,7 +120,7 @@ namespace Tennis_Betfair
                     }
                     label11.Invoke(new Action(() => { label11.Text = Closed.Nodes.Count.ToString(); }));
                     textBoxExt5.Invoke(new Action(() => { getStateThread(elem); }));
-                    if ((elem?.State365 == ThreadState.Stopped) && (elem?.StateBetfair == ThreadState.Stopped))
+                    if ((elem?.State365 == ThreadState.Stopped) && (elem?.StateBetfair == ThreadState.Stopped) )
                     {
                         radioButtonAdv1.Invoke(new Action(() =>
                         {
@@ -122,10 +136,10 @@ namespace Tennis_Betfair
                             textBoxExt7.Text = parse[0].Trim();
                             textBoxExt8.Text = parse[1].Trim();
                             digitalGauge1.Value = "Finished";
-                            textBoxExt4.Text = "Finished";
-                            textBoxExt4.BackColor = Color.Tomato;
-                            textBoxExt1.Text = "END";
-                            textBoxExt2.Text = "END";
+                            textBoxStatus.Text = "Finished";
+                            textBoxStatus.BackColor = Color.Tomato;
+                            textBoxScoreBetfair.Text = "END";
+                            textBoxScoreBet365.Text = "END";
                         }));
                     }
                     Thread.Sleep(1000);
@@ -140,54 +154,68 @@ namespace Tennis_Betfair
 
         private void OnPlayerChanged(ScoreUpdEventArgs marketArgs)
         {
-            textBoxExt1.Invoke(new Action(() =>
+            textBoxScoreBetfair.Invoke(new Action(() =>
             {
                 radioButtonAdv1.Text = marketArgs.ChangetMarket.Player1.Name;
                 radioButtonAdv2.Text = marketArgs.ChangetMarket.Player2.Name;
 
                 textBoxExt7.Text = marketArgs.ChangetMarket.Player1.Name;
                 textBoxExt8.Text = marketArgs.ChangetMarket.Player2.Name;
-                var one = marketArgs.ChangetMarket.GetBetFairScore();
-                var two = marketArgs.ChangetMarket.GetBet365Score();
+
+                var betFairScore = marketArgs.ChangetMarket.GetBetFairScore();
+                var bet365Score = marketArgs.ChangetMarket.GetBet365Score();
+                var skybetScore = marketArgs.ChangetMarket.GetSkyBetScore();
+                
                 digitalGauge1.Value = marketArgs.ChangetMarket.GetNewScore();
-                textBoxExt3.Text = marketArgs.ChangetMarket.MarketName;
+                textBoxMarket.Text = marketArgs.ChangetMarket.MarketName;
 
-
-                switch (one)
+                switch (betFairScore)
                 {
                     case " : ":
-                        one = "No score";
-                        label5.Visible = true;
+                        betFairScore = "No score";
+                        labelBetfairInfo.Visible = true;
                         break;
                     default:
-                        label5.Visible = false;
+                        labelBetfairInfo.Visible = false;
                         break;
                 }
-                switch (two)
+                switch (bet365Score)
                 {
                     case " : ":
-                        two = "No score";
-                        label4.Visible = true;
+                        bet365Score = "No score";
+                        labelBet365Info.Visible = true;
                         break;
                     default:
-                        label4.Visible = false;
+                        labelBet365Info.Visible = false;
+                        break;
+                }
+                switch (skybetScore)
+                {
+                    case " : ":
+                        skybetScore = "No score";
+                        labelSkyInfo.Visible = true;
+                        break;
+                    default:
+                        labelSkyInfo.Visible = false;
                         break;
                 }
                 if (marketArgs.ChangetMarket.IsClose)
                 {
-                    one = "END";
-                    two = "END";
+                    betFairScore = "END";
+                    bet365Score = "END";
+                    skybetScore = "END";
                     digitalGauge1.Value = "Finished";
-                    textBoxExt4.Text = "Finished";
-                    textBoxExt4.BackColor = Color.Tomato;
+                    textBoxStatus.Text = "Finished";
+                    textBoxStatus.BackColor = Color.Tomato;
                 }
                 else
                 {
-                    textBoxExt4.Text = "In-Play";
-                    textBoxExt4.BackColor = Color.SpringGreen;
+                    textBoxStatus.Text = "In-Play";
+                    textBoxStatus.BackColor = Color.SpringGreen;
                 }
-                textBoxExt1.Text = one;
-                textBoxExt2.Text = two;
+                textBoxScoreBetfair.Text = betFairScore;
+                textBoxScoreBet365.Text = bet365Score;
+                textBoxScoreSky.Text = skybetScore;
 
                 ClickPlayer(marketArgs);
 
@@ -301,15 +329,12 @@ namespace Tennis_Betfair
             if ((_allMarkets?.GetStatus() != null))
             {
                 _allMarkets.StopThreads();
-                _allMarkets.AbortThreads();
             }
-            // LoadingAnimator.Wire(treeViewAdv1);
             _allMarkets?.StartThreads();
             if ((_allMarkets?.GetStatus() != null))
             {
                 treeViewAdv1_NodeMouseClick(null, e_prev);
             }
-            //LoadingAnimator.UnWire(treeViewAdv1);
         }
 
         private void treeViewAdv1_NodeMouseClick(object sender, TreeViewAdvMouseClickEventArgs e)
@@ -329,14 +354,17 @@ namespace Tennis_Betfair
                 //*Check event*/
                 if ((market.Player1.Name != player1Node)
                     && (market.Player2.Name != player2Node)) continue;
+
                 var eventIdBetfair = market.BetfairEventId;
                 var eventId365 = market.Bet365EventId;
+                var eventIdSky = market.SkyBetEventId;
+
                 if ((eventIdBetfair == null) && (eventId365 == null)) _allMarkets.AllMarketsHashSet.Remove(market);
 
                 Debug.WriteLine("Event: " + eventId365 + " : " + eventIdBetfair);
 
                 CheckChange?.Invoke(
-                    new ChangedCheckEventArgs(eventIdBetfair, eventId365)
+                    new ChangedCheckEventArgs(eventIdBetfair, eventId365, eventIdSky)
                     );
 
                 Debug.WriteLine("Ok-Invoke");
@@ -363,7 +391,7 @@ namespace Tennis_Betfair
 
         private void radioButtonAdv9_CheckChanged(object sender, EventArgs e)
         {
-            _allMarkets.MarketIgnore(2);
+            _allMarkets.MarketIgnore(TypeDBO.Bet365);
             var elem = _allMarkets.GetStatus();
             getStateThread(elem);
             //bet365
@@ -371,72 +399,52 @@ namespace Tennis_Betfair
 
         private void radioButtonAdv8_CheckChanged(object sender, EventArgs e)
         {
-            _allMarkets.MarketIgnore(1); //
+            _allMarkets.MarketIgnore(TypeDBO.BetFair); //
             var elem = _allMarkets.GetStatus();
             getStateThread(elem);
         }
 
         private void radioButtonAdv10_CheckChanged(object sender, EventArgs e)
         {
-            _allMarkets.MarketIgnore(0);
+            _allMarkets.MarketIgnore(TypeDBO.None);
             var elem = _allMarkets.GetStatus();
 
             getStateThread(elem);
             //not ignore
         }
 
-        private void getStateThread(ThreadStatus elem)
+        private void updateTextBoxWithState(TextBoxExt textBox, ThreadState state)
         {
-            switch (elem.StateBetfair)
+            switch (state)
             {
                 case ThreadState.Running:
-                    textBoxExt5.Text = "alive";
-                    textBoxExt5.BackColor = Color.Aquamarine;
+                    textBox.Text = "alive";
+                    textBox.BackColor = Color.Aquamarine;
                     break;
                 case ThreadState.Aborted:
-                    textBoxExt5.Text = "aborted";
-                    textBoxExt5.BackColor = Color.LightSalmon;
+                    textBox.Text = "aborted";
+                    textBox.BackColor = Color.LightSalmon;
                     break;
                 case ThreadState.Stopped:
-                    textBoxExt5.Text = "stopped";
-                    textBoxExt5.BackColor = Color.LightSalmon;
+                    textBox.Text = "stopped";
+                    textBox.BackColor = Color.LightSalmon;
                     break;
                 case ThreadState.Suspended:
-                    textBoxExt5.Text = "ignore";
-                    textBoxExt5.BackColor = Color.Yellow;
+                    textBox.Text = "ignore";
+                    textBox.BackColor = Color.Yellow;
                     break;
                 case ThreadState.SuspendRequested:
-                    textBoxExt5.Text = "wait for ignore";
-                    textBoxExt5.BackColor = Color.Yellow;
-                    break;
-            }
-            switch (elem.State365)
-            {
-                case ThreadState.Running:
-                    textBoxExt6.Text = "alive";
-                    textBoxExt6.BackColor = Color.Aquamarine;
-                    break;
-                case ThreadState.Aborted:
-                    textBoxExt6.Text = "aborted";
-                    textBoxExt6.BackColor = Color.LightSalmon;
-                    break;
-                case ThreadState.Stopped:
-                    textBoxExt6.Text = "stopped";
-                    textBoxExt6.BackColor = Color.LightSalmon;
-                    break;
-                case ThreadState.Suspended:
-                    textBoxExt6.Text = "ignore";
-                    textBoxExt6.BackColor = Color.Yellow;
-                    break;
-                case ThreadState.SuspendRequested:
-                    textBoxExt6.Text = "wait for ignore";
-                    textBoxExt6.BackColor = Color.Yellow;
+                    textBox.Text = "wait for ignore";
+                    textBox.BackColor = Color.Yellow;
                     break;
             }
         }
 
-        private void buttonAdv2_Click(object sender, EventArgs e)
+        private void getStateThread(ThreadStatus elem)
         {
+            updateTextBoxWithState(textBoxExt9, elem.StateSky);
+            updateTextBoxWithState(textBoxExt5, elem.StateBetfair);
+            updateTextBoxWithState(textBoxExt6, elem.State365);
         }
 
         private void radioButtonAdv3_CheckChanged(object sender, EventArgs e)
@@ -471,7 +479,6 @@ namespace Tennis_Betfair
         {
             toClickIndex = 50;
             prevClickScore = -1;
-
             //Adv
         }
 
@@ -479,7 +486,6 @@ namespace Tennis_Betfair
         {
             toClickIndex = 0;
             prevClickScore = -1;
-
             //No
         }
 
@@ -495,6 +501,50 @@ namespace Tennis_Betfair
         private void radioButtonAdv2_CheckChanged(object sender, EventArgs e)
         {
             playerChecked = 2;
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void checkBoxNotIgnore_CheckStateChanged(object sender, EventArgs e)
+        {
+            if (checkBoxNotIgnore.Checked)
+            {
+                checkBoxBet365.Checked = false;
+                checkBoxBetfair.Checked = false;
+                checkBoxSky.Checked = false;
+            }
+        }
+
+        private void checkBoxBetfair_CheckStateChanged(object sender, EventArgs e)
+        {
+            if (checkBoxNotIgnore.Checked) checkBoxNotIgnore.Checked = false;
+            _allMarkets.MarketIgnore(TypeDBO.BetFair);
+            var elem = _allMarkets.GetStatus();
+            getStateThread(elem);
+        }
+
+        private void checkBoxBet365_CheckStateChanged(object sender, EventArgs e)
+        {
+            if (checkBoxNotIgnore.Checked) checkBoxNotIgnore.Checked = false;
+            _allMarkets.MarketIgnore(TypeDBO.Bet365);
+            var elem = _allMarkets.GetStatus();
+            getStateThread(elem);
+        }
+
+        private void checkBoxSky_CheckStateChanged(object sender, EventArgs e)
+        {
+            if (checkBoxNotIgnore.Checked) checkBoxNotIgnore.Checked = false;
+            _allMarkets.MarketIgnore(TypeDBO.SkyBet);
+            var elem = _allMarkets.GetStatus();
+            getStateThread(elem);
+        }
+
+        private void buttonAdv2_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

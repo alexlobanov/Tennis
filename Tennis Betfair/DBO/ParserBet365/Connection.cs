@@ -1,16 +1,20 @@
-﻿using System.IO;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Net;
 
 namespace Tennis_Betfair.DBO.ParserBet365
 {
-    public class Connection
+    public static class Connection
     {
-        public static string postRequest(string url, WebHeaderCollection headers)
+        public static string PostRequest(string url, WebHeaderCollection headers)
         {
             var responseFromServer = "";
-
-
+            ServicePointManager.Expect100Continue = false;
+            WebProxy myProxy = new WebProxy();
+            myProxy.IsBypassed(new Uri(url));
             var request = (HttpWebRequest) WebRequest.Create(url);
+            request.Proxy = myProxy;
             request.Method = "POST";
             request.ContentType = "text/plain; charset=UTF-8";
             request.Referer = Parse.BET365_HOME + "/";
@@ -21,13 +25,27 @@ namespace Tennis_Betfair.DBO.ParserBet365
             request.KeepAlive = true;
             request.ContentLength = 0;
             request.Headers.Add(headers);
-            //request.ContinueTimeout = 100000;
+            request.Timeout = 1500;
+            using (var response = (HttpWebResponse)request.GetResponse())
+            {
+                using (var dataStream = response.GetResponseStream())
+                {
+                    Debug.Assert(dataStream != null, "dataStream != null");
+                    using (BufferedStream buffer = new BufferedStream(dataStream))
+                    {
+                        using (StreamReader readerStream = new StreamReader(buffer))
+                        {
+                            responseFromServer = readerStream.ReadToEnd();
+                            readerStream.Close();
+                        }
+                        buffer.Close();
+                    }
+                    response.Close();
+                    dataStream.Close();
 
-            var response = request.GetResponse();
-            var dataStream = response.GetResponseStream();
-
-            var reader = new StreamReader(dataStream);
-            responseFromServer = reader.ReadToEnd();
+                }
+            }
+           
 
             return responseFromServer;
         }

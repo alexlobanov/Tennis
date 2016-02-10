@@ -62,6 +62,7 @@ namespace Tennis_Betfair.DBO
             Stream stream;
             using (var client = new WebClient())
             {
+                client.Proxy = null;
                 stream = client.OpenRead(AddTSToUrl(URL_GET_MARKET_SCORE_ONLY, eventId));
             }
             if (stream != null)

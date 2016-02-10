@@ -14,6 +14,8 @@ namespace Tennis_Betfair.TO.SkyBet
         private string scoreFirst;
         private string scoreSecond;
 
+        private string eventId;
+
         public ScoreInfo(string player1, string player2, string scoreFirst, string scoreSecond)
         {
             this.player1 = player1;
@@ -22,24 +24,23 @@ namespace Tennis_Betfair.TO.SkyBet
             this.scoreSecond = scoreSecond;
         }
 
-        public string Player1
+        public ScoreInfo(string player1, string player2, string scoreFirst, string scoreSecond, string eventId)
         {
-            get { return player1; }
+            this.player1 = player1;
+            this.player2 = player2;
+            this.scoreFirst = scoreFirst;
+            this.scoreSecond = scoreSecond;
+            this.eventId = eventId;
         }
 
-        public string Player2
-        {
-            get { return player2; }
-        }
+        public string EventId => eventId;
 
-        public string ScoreFirst
-        {
-            get { return scoreFirst; }
-        }
+        public string Player1 => player1;
 
-        public string ScoreSecond
-        {
-            get { return scoreSecond; }
-        }
+        public string Player2 => player2;
+
+        public string ScoreFirst => scoreFirst;
+
+        public string ScoreSecond => scoreSecond;
     }
 }

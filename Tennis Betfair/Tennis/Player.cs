@@ -12,6 +12,7 @@ namespace Tennis_Betfair
 
         private string _scoreBet365;
         private string _scoreBetfair;
+        private string _scoreSkyBet;
 
 
         public Player(string name, string score, bool isBetfair)
@@ -44,6 +45,28 @@ namespace Tennis_Betfair
                 }
                 PlayerHanlder?.Invoke(new PlayerScoreUpdEventArgs(value, TypeDBO.BetFair));
                 _scoreBetfair = value;
+            }
+        }
+
+        public string ScoreSkyBet
+        {
+            get
+            {
+                return _scoreSkyBet;
+                
+            }
+            set
+            {
+                OnPropertyChanged();
+                var integ = 0;
+                if (!int.TryParse(value, out integ))
+                {
+                    _scoreBet365 = "Adv";
+                    PlayerHanlder?.Invoke(new PlayerScoreUpdEventArgs("Adv", TypeDBO.SkyBet));
+                    return;
+                }
+                PlayerHanlder?.Invoke(new PlayerScoreUpdEventArgs(value, TypeDBO.SkyBet));
+                _scoreSkyBet = value;
             }
         }
 

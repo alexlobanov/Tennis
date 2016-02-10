@@ -18,7 +18,7 @@ namespace Tennis_Betfair.DBO.ParserBet365
 
         private static string RECORD_DELIM = "\\x01";
         private static string FIELD_DELIM = "\\x02";
-        private static readonly string[] CHANNELS = {"OVInPlay_1_3"};
+        private static readonly string[] CHANNELS = { "OVInPlay_1_9", "OVInPlay_1_3", "OVInPlay_1_6" };
 
         /*New*/
         private readonly CookieContainer _cookie = new CookieContainer();
@@ -29,8 +29,9 @@ namespace Tennis_Betfair.DBO.ParserBet365
         private string _clientRn;
         private string _homePage;
         private int _serverNum;
+        private bool isPrevContetion ;
 
-        public int GenerateRandom(int min, int max)
+        private int GenerateRandom(int min, int max)
         {
             var seed = Convert.ToInt32(Regex.Match(Guid.NewGuid().ToString(), @"\d+").Value);
             return new Random(seed).Next(min, max);
@@ -41,30 +42,54 @@ namespace Tennis_Betfair.DBO.ParserBet365
             var eventsList = new List<Event>();
             try
             {
-                Debug.WriteLine("Start parsing Bet365");
+                Debug.WriteLine("[Bet365]Start parsing Bet365");
+               
                 SetConnection();
+                isPrevContetion = true;
+                
             }
             catch (Exception e)
             {
-                Debug.WriteLine("Ex: " + e.Message + "stack: " + e.StackTrace);
+                Debug.WriteLine("[Bet365]Ex: " + e.Message + "stack: " + e.StackTrace);
                 return default(List<Event>);
             }
-            Debug.WriteLine("Connected to Bet365");
             var matches = new List<string>();
             var success = false;
             try
             {
                 foreach (var channel in CHANNELS)
                 {
-                    Debug.WriteLine("Trying to get events list from " + channel + " channel.");
-                    matches = GetAvailableMatches(channel);
-                    if (matches != null)
+                    Debug.WriteLine("[Bet365]Trying to get events list from " + channel + " channel.");
+                    var result = GetAvailableMatches(channel);
+                    if (result == null)
+                    {
+                        Debug.WriteLine("[Bet365] Result is null");
+                        success = false;
+                        continue;
+                    }
+                    if (matches.Count == 0)
+                    {
+                        if (result.Count != 0)
+                        {
+                            matches = result;
+                            Debug.WriteLine("[BET365] ALL OK WE FOUND ELEMS");
+                            success = true;
+                            break;
+                        }
+                    }
+                    if (matches.Count < result.Count)
+                    {
+                        matches = result;
+                        Debug.WriteLine("[Bet365] matches is more elements than previus: " + matches.Count + " : " + result.Count);
                         success = true;
+                        break;
+                    }
+                    success = true;
                 }
             }
             catch (Exception e)
             {
-                Debug.WriteLine("Ex in Chanel Get Mathes: " + e.Message + "stack: " + e.StackTrace);
+                Debug.WriteLine("[Bet365]Ex in Chanel Get Mathes: " + e.Message + "stack: " + e.StackTrace);
                 return default(List<Event>);
             }
             if (!success) return null;
@@ -75,16 +100,15 @@ namespace Tennis_Betfair.DBO.ParserBet365
                     var eventInfo = GetTennisEventInformation(match);
                     if (eventInfo == null)
                     {
-                        eventInfo = new Event(null, null, new Team(), new Team());
-                        eventInfo.IsClose = true;
-                        Debug.WriteLine("Finnishd");
+                        eventInfo = new Event(null, null, new Team(), new Team()) {IsClose = true};
+                        Debug.WriteLine("[Bet365]Finnishd");
                     }
                     eventsList.Add(eventInfo);
                 }
             }
             catch (Exception e)
             {
-                Debug.WriteLine("Ex in getTennisEvent Score: " + e.Message + "stack: " + e.StackTrace);
+                Debug.WriteLine("[Bet365]Ex in getTennisEvent Score: " + e.Message + "stack: " + e.StackTrace);
                 return default(List<Event>);
             }
             return eventsList;
@@ -93,17 +117,17 @@ namespace Tennis_Betfair.DBO.ParserBet365
 
         private void SetConnection()
         {
-            getCookies();
+            GetCookies();
             if (_cookie.Count == 0) return;
-            var sessionId = getProperty("sessionId");
+            var sessionId = GetProperty("sessionId");
             if (sessionId == null) return;
-            var connectionDetails = getProperty("ConnectionDetails");
+            var connectionDetails = GetProperty("ConnectionDetails");
             if (connectionDetails == null) return;
 
             sessionId = sessionId.Remove(0, 12);
             sessionId = sessionId.Remove(sessionId.Length - 1, 1);
 
-            setConnectionDetails(connectionDetails);
+            SetConnectionDetails(connectionDetails);
             if (hosts.Count != 2 || _ports.Count != 2) return;
 
             var buffer = new StringBuilder();
@@ -126,14 +150,26 @@ namespace Tennis_Betfair.DBO.ParserBet365
             var postResponce = powRequest(0, headesCollection);
             var temp = postResponce.Split((char) 0x02);
             _clientId = temp[1];
+            Debug.WriteLine("=========");
+            Debug.WriteLine("Tmp count: " + temp.Length);
+            Debug.WriteLine("ClientID: " + _clientId);
+            Debug.WriteLine("ClientRN: " + _clientRn);
+            Debug.WriteLine("SessionID: " + sessionId);
+            Debug.WriteLine("=========");
         }
 
         public Event GetTennisEventInformation(string id)
         {
-            subscribe(id);
+            Subscribe(id);
 
             var header = new WebHeaderCollection {{"method", "1"}};
             var requestPow = powRequest(2, header);
+            if (requestPow.Length < 50)
+            {
+                Debug.Write("Error. Repsonse from server" + requestPow);
+                Unsubscribe(id);
+                GetTennisEventInformation(id);
+            }
             var eventExpandedData = requestPow.Split((char) 0x01);
             eventExpandedData = eventExpandedData[eventExpandedData.Length - 1].Split((char) 0x7c);
 
@@ -143,8 +179,8 @@ namespace Tennis_Betfair.DBO.ParserBet365
             resultList.Add(new Dictionary<string, string>());
             resultList.Add(new Dictionary<string, string>());
 
-            int currentTeam;
             var firstItem = true;
+
             string currentKey = null;
             string competitionType = null;
             string eventName = null;
@@ -191,20 +227,23 @@ namespace Tennis_Betfair.DBO.ParserBet365
                     currentRoot.TryGetValue("OR", out equelsValue);
                     if (string.Equals(equelsValue, "0"))
                     {
-                        currentTeam = 0;
                         currentRoot.TryGetValue("PO", out team1Score);
                         currentRoot.TryGetValue("NA", out name1Player);
                     }
                     else
                     {
-                        currentTeam = 1;
                         currentRoot.TryGetValue("NA", out name2Player);
                         currentRoot.TryGetValue("PO", out team2Score);
                     }
                 }
             }
             Unsubscribe(id);
-            if (competitionType == null) return null;
+            if (competitionType == null)
+            {
+                Debug.WriteLine("[Bet365] Competition Type null");
+                Debug.Write("Repsonse from server" + requestPow);
+                return null;
+            }
             var team1 = new Team(name1Player, team1Score);
             var team2 = new Team(name2Player, team2Score);
             var eEvent = new Event(id, competitionType, team1, team2);
@@ -227,10 +266,10 @@ namespace Tennis_Betfair.DBO.ParserBet365
             }
             var totalHeaders = new WebHeaderCollection {specialHeaders, defaultHeaders};
             var url = hosts.ElementAt(1) + @"/pow/?sid=" + sid + "&rn=" + _clientRn;
-            return Connection.postRequest(url, totalHeaders);
+            return Connection.PostRequest(url, totalHeaders);
         }
 
-        private void setConnectionDetails(string connectionDetails)
+        private void SetConnectionDetails(string connectionDetails)
         {
             var pattern = "Host\":\"(.*?)\"";
             var reg = new Regex(pattern);
@@ -249,7 +288,7 @@ namespace Tennis_Betfair.DBO.ParserBet365
             _ports.Add(twoMatchPort.Remove(twoMatchPort.Length - 1, 1));
         }
 
-        private string getProperty(string property)
+        private string GetProperty(string property)
         {
             string pattern;
 
@@ -271,31 +310,35 @@ namespace Tennis_Betfair.DBO.ParserBet365
             {
                 return match.Value;
             }
+            Debug.WriteLine("[Bet365] Success == false");
             return null;
         }
 
-        private void getCookies()
+        private void GetCookies()
         {
             var html = new StringBuilder();
             var req = (HttpWebRequest) WebRequest.Create(BET365_HOME);
-            req.Timeout = 1000000;
+            //req.Timeout = 1000000;
             req.UserAgent = USER_AGENT;
             req.CookieContainer = _cookie;
-
+            req.Proxy = null;
             var encode = Encoding.GetEncoding("utf-8");
 
             using (var response = (HttpWebResponse) req.GetResponse())
             {
-                var cookies = new CookieCollection();
-                cookies = response.Cookies;
+                var cookies = response.Cookies;
                 _cookie.Add(_cookieHostname, cookies);
                 var readStream = new StreamReader(response?.GetResponseStream(), encode);
                 html.Append(readStream.ReadToEnd());
                 readStream.Close();
                 response.Close();
+                StringBuilder stringBuilder = new StringBuilder();
+               /* for (int i = 0; i < cookies.Count; i++)
+                {
+                    stringBuilder.AppendLine("[" + i + "] " + cookies[i]);
+                }
+                Debug.WriteLine("Cookie: " + stringBuilder.ToString());*/
             }
-            // var strToSub = Cookie.GetCookieHeader(CookieHostname).ToString();
-            //TODO: FIX;
             _homePage = html.ToString();
         }
 
@@ -316,25 +359,54 @@ namespace Tennis_Betfair.DBO.ParserBet365
 
         private List<string> GetEvents(string channel)
         {
-            subscribe(channel);
-            var headers = new WebHeaderCollection();
-            headers.Add("method", "1");
+            Subscribe(channel);
+            var headers = new WebHeaderCollection {{"method", "1"}};
             var gameDataRequest = powRequest(2, headers);
-
+            if (string.IsNullOrWhiteSpace(gameDataRequest))
+            {
+                Debug.WriteLine("[Bet365] Null string");
+                return null;
+            }
             var gameData = gameDataRequest.Split((char) 0x01);
-            gameData = gameData[gameData.Length - 1].Split((char) 0x7c);
-            var gameDateList = new List<string>(350);
-            gameDateList = gameData.ToList();
-            gameDateList.RemoveAt(0); //Remove F
-            if (gameDateList.Count == 0) return null;
+
+            var newParse = gameDataRequest.Split('|');
+            var oldParse = gameData[gameData.Length - 1].Split((char) 0x7c);
+            var gameDateList = new List<string>(100);
+            if (newParse.Length == oldParse.Length)
+                return default(List<string>);
+            if (newParse.Length > oldParse.Length)
+            {
+                gameDateList = newParse.ToList();
+                var countDeleteElems = gameDateList.TakeWhile(str => !str.Contains("CL")).Count();
+                gameDateList.RemoveRange(0,countDeleteElems);
+            }
+            else
+            {
+                gameDateList = oldParse.ToList();
+                var countDeleteElems = gameDateList.TakeWhile(str => !str.Contains("CL")).Count();
+                gameDateList.RemoveRange(0, countDeleteElems);
+            }
+            if (gameDateList.Count == 0) 
+            {
+                Debug.WriteLine("[Bet365]gameDateListNull: " + gameDataRequest);
+                return null;
+            }
             var initialCL = parameterizeLine(gameDateList[0]);
             var paramsDic = new Dictionary<string, string>();
             if (initialCL != null)
             {
                 initialCL.TryGetValue("CL", out paramsDic);
             }
-            if (paramsDic == null) return null;
-
+            else
+            {
+                Debug.WriteLine("[Bet365] InitialCl is null. Data from server: " + gameDataRequest);
+            }
+            /*if (paramsDic == null)
+            {
+                Debug.WriteLine("[Bet365] InitialCl is null. Data from server: " + gameDataRequest);
+                return null;
+            }*/
+            Debug.WriteLine("[Bet365] InitialCl is good. Data from server: " + gameDataRequest);
             var events = new List<string>(5);
             var isTennis = false;
             var isFirst = true;
@@ -367,12 +439,16 @@ namespace Tennis_Betfair.DBO.ParserBet365
                 if (lineData.ContainsKey("EV"))
                 {
                     var Id = "";
-                    var tmp = new Dictionary<string, string>();
+                    Dictionary<string, string> tmp;
                     lineData.TryGetValue("EV", out tmp);
-                    tmp.TryGetValue("ID", out Id);
-                    if (Id.Length == 18)
+
+                    if (tmp != null) tmp.TryGetValue("ID", out Id);
+                    else Debug.WriteLine("[Bet365]No id in parseline. Continue");
+
+                    if (Id==null) Debug.WriteLine("[Bet365] ID IS NULL");
+                    if ((Id != null)&&(Id.Trim().Length == 18))
                     {
-                        events.Add(Id);
+                        events.Add(Id.Trim());
                     }
                 }
             }
@@ -380,7 +456,7 @@ namespace Tennis_Betfair.DBO.ParserBet365
             return events;
         }
 
-        private void subscribe(string channel)
+        private void Subscribe(string channel)
         {
             var headers = new WebHeaderCollection {{"method", "22"}, {"topic", channel}};
             powRequest(2, headers);
