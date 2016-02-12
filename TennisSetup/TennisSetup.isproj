@@ -28,9 +28,10 @@
 		</TaggedOutputs> -->
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath32)\InstallShield\2015Limited\InstallShield.targets"/>
+	<ItemGroup/>
 	<ItemGroup>
-		<ProjectReference Include="..\Tennis Betfair\Tennis Betfair.csproj">
-			<Name>Tennis Betfair</Name>
+		<ProjectReference Include="..\Tennis Betfair\Tennis Live Scores.csproj">
+			<Name>Tennis Live Scores</Name>
 			<Project>{7C768EE4-2A8E-44A9-8192-F670B40FD3DC}</Project>
 		</ProjectReference>
 	</ItemGroup>

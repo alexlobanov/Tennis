@@ -179,6 +179,8 @@ namespace Tennis_Betfair
                     result = GetSkyBetS();
                 break;
             }
+            ScoreNewOne = result.Split(':')[0].Trim();
+            ScoreNewTwo = result.Split(':')[1].Trim();
             return result;
         }
 

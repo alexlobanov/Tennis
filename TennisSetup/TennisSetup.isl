@@ -52,10 +52,10 @@
 	<summary>
 		<codepage>1252</codepage>
 		<title>Installation Database</title>
-		<subject/>
+		<subject></subject>
 		<author>##ID_STRING2##</author>
 		<keywords>Installer,MSI,Database</keywords>
-		<comments>Contact:  Your local administrator</comments>
+		<comments>##ID_STRING4##</comments>
 		<template>Intel;1033</template>
 		<lastauthor>Administrator</lastauthor>
 		<revnumber>{1F90B349-20C3-4ABE-8A7C-F9A2B22223A6}</revnumber>
@@ -339,7 +339,7 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
-		<row><td>Component</td><td>{45750B63-B25D-4C75-9D16-3F3BDED275B4}</td><td>INSTALLDIR</td><td>2</td><td/><td>File</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Component</td><td>{6795AC51-3E87-4719-B511-FC8A89F5F2E8}</td><td>INSTALLDIR</td><td>2</td><td/><td>File</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
 	<table name="Condition">
@@ -1139,7 +1139,7 @@
 		<row><td>FavoritesFolder</td><td>TARGETDIR</td><td>.:FAVORI~1|Favorites</td><td/><td>0</td><td/></row>
 		<row><td>FontsFolder</td><td>TARGETDIR</td><td>.:Fonts</td><td/><td>0</td><td/></row>
 		<row><td>GlobalAssemblyCache</td><td>TARGETDIR</td><td>.:Global~1|GlobalAssemblyCache</td><td/><td>0</td><td/></row>
-		<row><td>INSTALLDIR</td><td>MY_PRODUCT_NAME</td><td>.</td><td/><td>0</td><td/></row>
+		<row><td>INSTALLDIR</td><td>TENNISLIVE</td><td>.</td><td/><td>0</td><td/></row>
 		<row><td>ISCommonFilesFolder</td><td>CommonFilesFolder</td><td>Instal~1|InstallShield</td><td/><td>0</td><td/></row>
 		<row><td>ISMyCompanyDir</td><td>ProgramFilesFolder</td><td>MYCOMP~1|My Company Name</td><td/><td>0</td><td/></row>
 		<row><td>ISMyProductDir</td><td>ISMyCompanyDir</td><td>MYPROD~1|My Product Name</td><td/><td>0</td><td/></row>
@@ -1162,6 +1162,7 @@
 		<row><td>System64Folder</td><td>TARGETDIR</td><td>.:System64</td><td/><td>0</td><td/></row>
 		<row><td>SystemFolder</td><td>TARGETDIR</td><td>.:System32</td><td/><td>0</td><td/></row>
 		<row><td>TARGETDIR</td><td/><td>SourceDir</td><td/><td>0</td><td/></row>
+		<row><td>TENNISLIVE</td><td>ALEXANDER_LOBANOV</td><td>TENNIS~1|TennisLive</td><td/><td>0</td><td/></row>
 		<row><td>TempFolder</td><td>TARGETDIR</td><td>.:Temp</td><td/><td>0</td><td/></row>
 		<row><td>TemplateFolder</td><td>TARGETDIR</td><td>.:ShellNew</td><td/><td>0</td><td/></row>
 		<row><td>USERPROFILE</td><td>TARGETDIR</td><td>.:USERPR~1|UserProfile</td><td/><td>0</td><td/></row>
@@ -1875,7 +1876,7 @@
 		<col def="S255">ISBuildSourcePath</col>
 		<col def="I4">ISAttributes</col>
 		<col def="S72">ISComponentSubFolder_</col>
-		<row><td>File</td><td>Component</td><td>Tennis Betfair.Основные выходные файлы</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Tennis Betfair&gt;|Built</td><td>3</td><td/></row>
+		<row><td>File</td><td>Component</td><td>Tennis Live Scores.Основные выходные файлы</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Tennis Live Scores&gt;|Built</td><td>3</td><td/></row>
 	</table>
 
 	<table name="FileSFPCatalog">
@@ -2017,7 +2018,7 @@
 		<col def="S0">FTPLocation</col>
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
-		<row><td>Component</td><td/><td/><td>_2E2EC7DC_2BA4_4012_BAC8_11FD1CE695A8_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Component</td><td/><td/><td>_587EFA31_1F93_4CCD_9B9B_24B47EBE9D08_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="ISCustomActionReference">
@@ -2303,6 +2304,7 @@
 		<row><td>ProgramFilesFolder</td><td/><td/><td>1</td></row>
 		<row><td>SystemFolder</td><td/><td/><td>1</td></row>
 		<row><td>Tennis Betfair</td><td>Tennis Betfair\Tennis Betfair.csproj</td><td/><td>2</td></row>
+		<row><td>Tennis Live Scores</td><td>Tennis Betfair\Tennis Live Scores.csproj</td><td/><td>2</td></row>
 		<row><td>WindowsFolder</td><td/><td/><td>1</td></row>
 	</table>
 
@@ -2573,6 +2575,7 @@
 		<col def="I2">Order</col>
 		<col def="I2">ISSetupLocation</col>
 		<col def="S255">ISReleaseFlags</col>
+		<row><td>_F76AC9B6_52AD_4F02_BFBC_02ECC3AEF822_</td><td>Microsoft .NET Framework 4.6 Web.prq</td><td/><td/><td/></row>
 	</table>
 
 	<table name="ISSetupType">
@@ -2606,7 +2609,7 @@
 		<col def="I2">Encoded</col>
 		<col def="S0">Comment</col>
 		<col def="I4">TimeStamp</col>
-		<row><td>COMPANY_NAME</td><td>1033</td><td>Alexander Lobanov</td><td>0</td><td/><td>556012000</td></row>
+		<row><td>COMPANY_NAME</td><td>1033</td><td>Alexander Lobanov</td><td>0</td><td/><td>1629795788</td></row>
 		<row><td>DN_AlwaysInstall</td><td>1033</td><td>Always Install</td><td>0</td><td/><td>556009952</td></row>
 		<row><td>IDPROP_EXPRESS_LAUNCH_CONDITION_COLOR</td><td>1033</td><td>The color settings of your system are not adequate for running [ProductName].</td><td>0</td><td/><td>556009952</td></row>
 		<row><td>IDPROP_EXPRESS_LAUNCH_CONDITION_OS</td><td>1033</td><td>The operating system is not adequate for running [ProductName].</td><td>0</td><td/><td>556009952</td></row>
@@ -3707,9 +3710,11 @@
 		<row><td>IDS__TargetReq_DESC_PROCESSOR</td><td>1033</td><td>The processor is not adequate for running [ProductName].</td><td>0</td><td/><td>556009952</td></row>
 		<row><td>IDS__TargetReq_DESC_RAM</td><td>1033</td><td>The amount of RAM is not adequate for running [ProductName].</td><td>0</td><td/><td>556009952</td></row>
 		<row><td>IDS__TargetReq_DESC_RESOLUTION</td><td>1033</td><td>The screen resolution is not adequate for running [ProductName].</td><td>0</td><td/><td>556009952</td></row>
-		<row><td>ID_STRING1</td><td>1033</td><td>upwork.com</td><td>0</td><td/><td>556032480</td></row>
-		<row><td>ID_STRING2</td><td>1033</td><td>Alexander Lobanov</td><td>0</td><td/><td>556012000</td></row>
+		<row><td>ID_STRING1</td><td>1033</td><td>http://www.AlexanderLobanov.com</td><td>0</td><td/><td>1629795788</td></row>
+		<row><td>ID_STRING2</td><td>1033</td><td>Alexander Lobanov</td><td>0</td><td/><td>1629795788</td></row>
 		<row><td>ID_STRING3</td><td>1033</td><td>Tennis</td><td>0</td><td/><td>556063232</td></row>
+		<row><td>ID_STRING4</td><td>1033</td><td>Contact:  winstondiz@gmail.com</td><td>0</td><td/><td>1629785516</td></row>
+		<row><td>ID_STRING5</td><td>1033</td><td>Tennis</td><td>0</td><td/><td>1629757036</td></row>
 		<row><td>IIDS_UITEXT_FeatureUninstalled</td><td>1033</td><td>This feature will remain uninstalled.</td><td>0</td><td/><td>556009952</td></row>
 	</table>
 
@@ -3956,7 +3961,7 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>ISTheme</td><td>InstallShield Blue.theme</td></row>
 		<row><td>ISUSLock</td><td>{943ECA31-0B97-4CE1-8F24-6F08A2A6FDBF}</td></row>
 		<row><td>ISUSSignature</td><td>{0B63F5AA-523D-4686-A1B9-777C4D787105}</td></row>
-		<row><td>ISVisitedViews</td><td>viewAssistant,viewShortcuts,viewAppFiles,viewObjects</td></row>
+		<row><td>ISVisitedViews</td><td>viewAssistant,viewShortcuts,viewAppFiles,viewObjects,viewSystemSearch,viewProject,viewUpdateService</td></row>
 		<row><td>Limited</td><td>1</td></row>
 		<row><td>LockPermissionMode</td><td>1</td></row>
 		<row><td>MsiExecCmdLineOptions</td><td/></row>
@@ -4014,6 +4019,7 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 	<table name="LaunchCondition">
 		<col key="yes" def="s255">Condition</col>
 		<col def="l255">Description</col>
+		<row><td>(Not Version9X) And (Not ((VersionNT&gt;=400 And VersionNT&lt;=601) Or (VersionNT=602 And MsiNTProductType&gt;1)))</td><td>##IDPROP_EXPRESS_LAUNCH_CONDITION_OS##</td></row>
 	</table>
 
 	<table name="ListBox">
@@ -4330,7 +4336,7 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS</td><td>##IDS_PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS##</td><td/></row>
 		<row><td>ProductCode</td><td>{B1A7DD55-01BE-41EC-A209-457935DC121A}</td><td/></row>
 		<row><td>ProductName</td><td>TennisSetup</td><td/></row>
-		<row><td>ProductVersion</td><td>0.11.0000</td><td/></row>
+		<row><td>ProductVersion</td><td>0.12.0000</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>
 		<row><td>ProgressType1</td><td>Installing</td><td/></row>
 		<row><td>ProgressType2</td><td>installed</td><td/></row>
@@ -4405,9 +4411,6 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<col def="L255">FileName</col>
 		<col def="s72">DirProperty</col>
 		<col def="i2">InstallMode</col>
-		<row><td>FileKey1</td><td>Component</td><td/><td>alexan_1_alexander_lobanov</td><td>2</td></row>
-		<row><td>FileKey2</td><td>Component</td><td/><td>tennis_1_tennissetup</td><td>2</td></row>
-		<row><td>_Built</td><td>Component</td><td/><td>tennis_1_tennissetup</td><td>2</td></row>
 	</table>
 
 	<table name="RemoveIniFile">
@@ -4493,8 +4496,7 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<col def="S255">ISComments</col>
 		<col def="S255">ISShortcutName</col>
 		<col def="I4">ISAttributes</col>
-		<row><td>NewShortcut1</td><td>DesktopFolder</td><td>##ID_STRING3##</td><td>Component</td><td>AlwaysInstall</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>_Built</td><td>tennis_1_tennissetup</td><td>##IDS_SHORTCUT_DISPLAY_NAME1##</td><td>Component</td><td>AlwaysInstall</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut1</td><td>DesktopFolder</td><td>##ID_STRING5##</td><td>Component</td><td>AlwaysInstall</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="Signature">
