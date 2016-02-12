@@ -14,11 +14,7 @@ namespace Tennis_Betfair.DBO.ParserBet365
     {
         public static string BET365_HOME = "https://mobile.bet365.com";
         public static string USER_AGENT = "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:41.0) Gecko/20100101 Firefox/41.0";
-
-
-        private static string RECORD_DELIM = "\\x01";
-        private static string FIELD_DELIM = "\\x02";
-        private static readonly string[] CHANNELS = { "OVInPlay_1_9", "OVInPlay_1_3", "OVInPlay_1_6" };
+        private static readonly string[] CHANNELS = {"OVInPlay_1_9", "OVInPlay_1_3", "OVInPlay_1_6"};
 
         /*New*/
         private readonly CookieContainer _cookie = new CookieContainer();
@@ -29,7 +25,6 @@ namespace Tennis_Betfair.DBO.ParserBet365
         private string _clientRn;
         private string _homePage;
         private int _serverNum;
-        private bool isPrevContetion ;
 
         private int GenerateRandom(int min, int max)
         {
@@ -43,10 +38,8 @@ namespace Tennis_Betfair.DBO.ParserBet365
             try
             {
                 Debug.WriteLine("[Bet365]Start parsing Bet365");
-               
+
                 SetConnection();
-                isPrevContetion = true;
-                
             }
             catch (Exception e)
             {
@@ -80,7 +73,8 @@ namespace Tennis_Betfair.DBO.ParserBet365
                     if (matches.Count < result.Count)
                     {
                         matches = result;
-                        Debug.WriteLine("[Bet365] matches is more elements than previus: " + matches.Count + " : " + result.Count);
+                        Debug.WriteLine("[Bet365] matches is more elements than previus: " + matches.Count + " : " +
+                                        result.Count);
                         success = true;
                         break;
                     }
@@ -332,8 +326,8 @@ namespace Tennis_Betfair.DBO.ParserBet365
                 html.Append(readStream.ReadToEnd());
                 readStream.Close();
                 response.Close();
-                StringBuilder stringBuilder = new StringBuilder();
-               /* for (int i = 0; i < cookies.Count; i++)
+                var stringBuilder = new StringBuilder();
+                /* for (int i = 0; i < cookies.Count; i++)
                 {
                     stringBuilder.AppendLine("[" + i + "] " + cookies[i]);
                 }
@@ -378,7 +372,7 @@ namespace Tennis_Betfair.DBO.ParserBet365
             {
                 gameDateList = newParse.ToList();
                 var countDeleteElems = gameDateList.TakeWhile(str => !str.Contains("CL")).Count();
-                gameDateList.RemoveRange(0,countDeleteElems);
+                gameDateList.RemoveRange(0, countDeleteElems);
             }
             else
             {
@@ -386,7 +380,7 @@ namespace Tennis_Betfair.DBO.ParserBet365
                 var countDeleteElems = gameDateList.TakeWhile(str => !str.Contains("CL")).Count();
                 gameDateList.RemoveRange(0, countDeleteElems);
             }
-            if (gameDateList.Count == 0) 
+            if (gameDateList.Count == 0)
             {
                 Debug.WriteLine("[Bet365]gameDateListNull: " + gameDataRequest);
                 return null;
@@ -445,8 +439,8 @@ namespace Tennis_Betfair.DBO.ParserBet365
                     if (tmp != null) tmp.TryGetValue("ID", out Id);
                     else Debug.WriteLine("[Bet365]No id in parseline. Continue");
 
-                    if (Id==null) Debug.WriteLine("[Bet365] ID IS NULL");
-                    if ((Id != null)&&(Id.Trim().Length == 18))
+                    if (Id == null) Debug.WriteLine("[Bet365] ID IS NULL");
+                    if ((Id != null) && (Id.Trim().Length == 18))
                     {
                         events.Add(Id.Trim());
                     }

@@ -70,109 +70,111 @@ namespace Tennis_Betfair
         public static event LoadedEventHandler LoadedEvent;
 
         public static event MarketChangedEventHandler MarketChanged;
+        private DateTime betfairScoreTime;
+        private DateTime skyBetScoreTime;
+        private DateTime bet365ScoreTime;
+
+        private string prevScoreBetfair;
+        private string prevScore365;
+        private string prevScoreSkyBet;
+
+        private static readonly string NO_SCORE = "No score";
 
         /// <summary>
         /// Получает строку со счётом с betfair
         /// </summary>
-        /// <returns>Счёт с betfair</returns>
-        public string GetBetFairScore()
+        /// <returns>Счёт</returns>
+        public string GetBetfairS()
         {
             var newScore = Player1.ScoreBetfair1 + " : " + Player2.ScoreBetfair1;
-            if ((_prevBetfairScore == null) || (!_prevBetfairScore.Equals(newScore)) || _prevBetfairScore == " : ")
+            if ((prevScoreBetfair == null) || (!prevScoreBetfair.Equals(newScore)) || (prevScoreBetfair == " : "))
             {
-                Debug.WriteLine("[Betfair] " + newScore);
-                if ((!(DateTime.Now.CompareTo(_betfairSpan.AddSeconds(2)) <= 0)) || _betfairSpan == DateTime.MinValue)
+                if ((betfairScoreTime.AddSeconds(2).CompareTo(DateTime.Now) <= 0) || (betfairScoreTime == DateTime.MinValue))
                 {
-                  
-                    _betfairSpan = DateTime.Now;
-                    _prevBetfairScore = Player1.ScoreBetfair1 + " : " + Player2.ScoreBetfair1;
+                    Debug.WriteLine("[BetFair]: " + newScore);
+                    betfairScoreTime = DateTime.Now;
+                    prevScoreBetfair = newScore;
+                    return prevScoreBetfair;
                 }
             }
-            return Player1.ScoreBetfair1 + " : " + Player2.ScoreBetfair1;
-        }
-
-     
-
-        /// <summary>
-        /// Получает строку со счётом с bet365
-        /// </summary>
-        /// <returns>Счёт</returns>
-        public string GetBet365Score()
-        {
-            var newScore = Player1.ScoreBet366 + " : " + Player2.ScoreBet366;
-            if ((_prevBet365Score == null) || (!_prevBet365Score.Equals(newScore)) || _prevBet365Score == " : ")
-            {
-                Debug.WriteLine("[Bet365] " + newScore);
-                if ((!(DateTime.Now.CompareTo(_bet365Span.AddSeconds(2)) <= 0))
-                    || (_bet365Span == DateTime.MinValue))
-                {
-                    _bet365Span = DateTime.Now;
-                    _prevBet365Score = Player1.ScoreBet366 + " : " + Player2.ScoreBet366;
-                }
-            }
-            return Player1.ScoreBet366 + " : " + Player2.ScoreBet366;
+            return string.IsNullOrEmpty(prevScoreBetfair) ? NO_SCORE : prevScoreBetfair;
         }
 
         /// <summary>
         /// Получает строку со счётом с skybet
         /// </summary>
         /// <returns>Счёт</returns>
-        public string GetSkyBetScore()
+        public string GetSkyBetS()
         {
             var newScore = Player1.ScoreSkyBet + " : " + Player2.ScoreSkyBet;
-            if ((_prevSkybetScore == null) || (!_prevSkybetScore.Equals(newScore)) || _prevSkybetScore == " : ")
+            if ((prevScoreSkyBet == null) || (!prevScoreSkyBet.Equals(newScore)) || (prevScoreSkyBet == " : "))
             {
-                Debug.WriteLine("[Skybet] " + newScore);
-                if ((!(DateTime.Now.CompareTo(_skyBetSpan.AddSeconds(2)) <= 0))
-                    || (_skyBetSpan == DateTime.MinValue))
+                if ((skyBetScoreTime.AddSeconds(2).CompareTo(DateTime.Now) <= 0) || (skyBetScoreTime == DateTime.MinValue))
                 {
-                    _skyBetSpan = DateTime.Now;
-                    _prevSkybetScore = Player1.ScoreSkyBet + " : " + Player2.ScoreSkyBet;
+                    Debug.WriteLine("[SkyBet]: " + newScore);
+                    skyBetScoreTime = DateTime.Now;
+                    prevScoreSkyBet = newScore;
+                    return prevScoreSkyBet;
                 }
             }
-            return Player1.ScoreSkyBet + " : " + Player2.ScoreSkyBet;
+            return string.IsNullOrEmpty(prevScoreSkyBet) ? NO_SCORE : prevScoreSkyBet;
+        }
+           /// <summary>
+        /// Получает строку со счётом с 365
+        /// </summary>
+        /// <returns>Счёт</returns>
+        public string Get365S()
+        {
+            var newScore = Player1.ScoreBet366 + " : " + Player2.ScoreBet366;
+            if ((prevScore365 == null) || (!prevScore365.Equals(newScore)) || (prevScore365 == " : "))
+            {
+                if ((bet365ScoreTime.AddSeconds(2).CompareTo(DateTime.Now) <= 0) || (bet365ScoreTime == DateTime.MinValue))
+                {
+                    Debug.WriteLine("[Get365]: " + newScore);
+                    bet365ScoreTime = DateTime.Now;
+                    prevScore365 = newScore;
+                    return prevScore365;
+                }
+            }
+            return string.IsNullOrEmpty(prevScore365) ? NO_SCORE : prevScore365;
         }
 
         /// <summary>
         /// Итоговый счёт со всех бирж
         /// </summary>
         /// <returns>Счёт со всех бирж</returns>
-
-        public string GetNewScore()
+        public string GetNewS()
         {
+            var max = bet365ScoreTime;
+            TypeDBO typeMax = TypeDBO.BetFair;
+            if (max.CompareTo(bet365ScoreTime) < 0)
+            {
+                max = bet365ScoreTime;
+                typeMax = TypeDBO.Bet365;
+            }
+            if (max.CompareTo(skyBetScoreTime) < 0)
+            {
+                max = skyBetScoreTime;
+                typeMax = TypeDBO.SkyBet;
+            }
             var result = "";
-            if ((_bet365Span.CompareTo(_betfairSpan) > 0))
+            switch (typeMax)
             {
-                result = _prevBet365Score;
-                _prevNewScore = _prevBet365Score;
-            }
-            else if ((_bet365Span.CompareTo(_betfairSpan) < 0))
-            {
-                result = _prevBetfairScore;
-                _prevNewScore = _prevBetfairScore;
-            }
-            else if (_prevNewScore != null)
-            {
-                result = _prevNewScore;
-            }
-            else result = "0 : 0";
-            var scores = result.Split();
-            if (scores.Count() == 3)
-            {
-                ScoreNewOne = scores[0].Trim();
-                ScoreNewTwo = scores[2].Trim();
-            }
-            if (result == " : ")
-            {
-                var elem1 = GetBet365Score();
-                var elem2 = GetBetFairScore();
-                if (elem1 != " : ")
-                    return elem1;
-                return elem2;
+                case TypeDBO.Bet365:
+                    result = Get365S();
+                break;
+                case TypeDBO.BetFair:
+                    result = GetBetfairS();
+                break;
+                case TypeDBO.SkyBet:
+                    result = GetSkyBetS();
+                break;
             }
             return result;
         }
 
+      
+    
         private void Player2OnPlayerHanlder(PlayerScoreUpdEventArgs scoreUpdEventArgs)
         {
             switch (scoreUpdEventArgs.TypeEx)

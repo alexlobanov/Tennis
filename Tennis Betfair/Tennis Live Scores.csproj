@@ -92,7 +92,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CheckInternetConenction.cs" />
+    <Compile Include="Others\CheckInternetConenction.cs" />
     <Compile Include="DBO\Bet365Class.cs" />
     <Compile Include="DBO\ParserBet365\Connection.cs" />
     <Compile Include="DBO\ParserBet365\Parse.cs" />
@@ -104,7 +104,7 @@
     <Compile Include="Events\PlayerScoreUpdEventArgs.cs" />
     <Compile Include="Events\ScoreUpdEventArgs.cs" />
     <Compile Include="Events\UnCheckEventsArgs.cs" />
-    <Compile Include="LoadingAnimator.cs" />
+    <Compile Include="Others\LoadingAnimator.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -116,17 +116,18 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="SimulateMouseClick.cs" />
+    <Compile Include="Others\SimulateMouseClick.cs" />
     <Compile Include="Tennis\AllMarkets.cs" />
     <Compile Include="Tennis\Market.cs" />
+    <Compile Include="Tennis\ParsingInfo.cs" />
     <Compile Include="Tennis\Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tennis\ThreadControl.cs" />
     <Compile Include="TO\Bet365\Event.cs" />
     <Compile Include="TO\Bet365\Team.cs" />
     <Compile Include="TO\BetFair\GetMarkets\GetMarketData.cs" />
     <Compile Include="TO\BetFair\GetScore\GetScore.cs" />
+    <Compile Include="TO\GetScoreStruct.cs" />
     <Compile Include="TO\SkyBet\MarketInfo.cs" />
     <Compile Include="TO\SkyBet\ScoreInfo.cs" />
     <Compile Include="TO\ThreadScore.cs" />

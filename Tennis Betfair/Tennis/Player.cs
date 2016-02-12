@@ -61,7 +61,7 @@ namespace Tennis_Betfair
                 var integ = 0;
                 if (!int.TryParse(value, out integ))
                 {
-                    _scoreBet365 = "Adv";
+                    _scoreSkyBet = "Adv";
                     PlayerHanlder?.Invoke(new PlayerScoreUpdEventArgs("Adv", TypeDBO.SkyBet));
                     return;
                 }

@@ -19,14 +19,20 @@ namespace UnitTest
             var allmarkets = new AllMarkets();
             var result = allmarkets.GetAllMarkets(TypeDBO.SkyBet);
             if (result == false) Assert.Fail("No info [market == null]");
-            if (allmarkets.AllMarketsHashSet.Count == 0) Assert.Fail("No elems from parse. Maybee no inplay games?");
-            foreach (var marketInfo in allmarkets.AllMarketsHashSet)
+            if (allmarkets.ParsingInfo.AllMarketsHashSet.Count == 0) Assert.Fail("No elems from parse. Maybee no inplay games?");
+            foreach (var marketInfo in allmarkets.ParsingInfo.AllMarketsHashSet)
             {
                 if (marketInfo.Player1 == null) Assert.Fail("No info about player1 in some markets");
                 if (marketInfo.Player2 == null) Assert.Fail("No info about player2 in some markets");
                 if (marketInfo.MarketName.Length < 4) Assert.Fail("No info about player1 in some markets");
             }
-            Debug.WriteLine("Elems from skyBet: " + allmarkets.AllMarketsHashSet.Count);
+            Debug.WriteLine("Elems from skyBet: " + allmarkets.ParsingInfo.AllMarketsHashSet.Count);
+            Debug.WriteLine("Names of players: ");
+            foreach (var market in allmarkets.ParsingInfo.AllMarketsHashSet)
+            {
+                Debug.WriteLine(market.Player1.Name + " : " + market.Player2.Name);
+            }
+            Debug.WriteLine("");
         }
 
 
@@ -37,8 +43,8 @@ namespace UnitTest
             var allmarkets = new AllMarkets();
             var result = allmarkets.GetAllMarkets(TypeDBO.SkyBet);
             if (result == false) Assert.Fail("No info [market == null]");
-            if (allmarkets.AllMarketsHashSet.Count == 0) Assert.Fail("No elems from parse. Maybee no inplay games?");
-            foreach (var marketInfo in allmarkets.AllMarketsHashSet)
+            if (allmarkets.ParsingInfo.AllMarketsHashSet.Count == 0) Assert.Fail("No elems from parse. Maybee no inplay games?");
+            foreach (var marketInfo in allmarkets.ParsingInfo.AllMarketsHashSet)
             {
                 if (marketInfo.SkyBetEventId == null) Assert.Fail("No info eventId from skybet");
                 var statusScore = allmarkets.GetScoreMarket(marketInfo.SkyBetEventId, TypeDBO.SkyBet);
@@ -60,7 +66,7 @@ namespace UnitTest
                 }
                 if (marketInfo.MarketName.Length < 4) Assert.Fail("No info about player1 in some markets");
             }
-            Debug.WriteLine("In-plays markets: " + allmarkets.AllMarketsHashSet.Count);
+            Debug.WriteLine("In-plays markets: " + allmarkets.ParsingInfo.AllMarketsHashSet.Count);
 
           
         }

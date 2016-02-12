@@ -33,8 +33,6 @@ namespace Tennis_Betfair
         private readonly Thread UiThread;
         private readonly Thread CheckConnetionThread;
 
-        private ChangedCheckEventArgs _prev;
-
         private TreeViewAdvMouseClickEventArgs e_prev;
 
         private bool isChengedScoreOne;
@@ -55,7 +53,7 @@ namespace Tennis_Betfair
 
             _allMarkets = new AllMarkets();
             Market.MarketChanged += OnMarketChangedEvent;
-            AllMarkets.playerChanged += OnPlayerChanged;
+            ParsingInfo.playerChanged += OnPlayerChanged;
             AllMarkets.LoadedEvent += OnLoadedEvent;
 
             UiThread = new Thread(Start) {Name = "UiThread"};
@@ -162,43 +160,17 @@ namespace Tennis_Betfair
                 textBoxExt7.Text = marketArgs.ChangetMarket.Player1.Name;
                 textBoxExt8.Text = marketArgs.ChangetMarket.Player2.Name;
 
-                var betFairScore = marketArgs.ChangetMarket.GetBetFairScore();
-                var bet365Score = marketArgs.ChangetMarket.GetBet365Score();
-                var skybetScore = marketArgs.ChangetMarket.GetSkyBetScore();
+                var betFairScore = marketArgs.ChangetMarket.GetBetfairS();
+                var bet365Score = marketArgs.ChangetMarket.Get365S();
+                var skybetScore = marketArgs.ChangetMarket.GetSkyBetS();
                 
-                digitalGauge1.Value = marketArgs.ChangetMarket.GetNewScore();
+                digitalGauge1.Value = marketArgs.ChangetMarket.GetNewS();
                 textBoxMarket.Text = marketArgs.ChangetMarket.MarketName;
 
-                switch (betFairScore)
-                {
-                    case " : ":
-                        betFairScore = "No score";
-                        labelBetfairInfo.Visible = true;
-                        break;
-                    default:
-                        labelBetfairInfo.Visible = false;
-                        break;
-                }
-                switch (bet365Score)
-                {
-                    case " : ":
-                        bet365Score = "No score";
-                        labelBet365Info.Visible = true;
-                        break;
-                    default:
-                        labelBet365Info.Visible = false;
-                        break;
-                }
-                switch (skybetScore)
-                {
-                    case " : ":
-                        skybetScore = "No score";
-                        labelSkyInfo.Visible = true;
-                        break;
-                    default:
-                        labelSkyInfo.Visible = false;
-                        break;
-                }
+                betFairScore = CheckForNullScore(betFairScore,labelBetfairInfo);
+                bet365Score = CheckForNullScore(bet365Score, labelBet365Info);
+                skybetScore = CheckForNullScore(skybetScore, labelSkyInfo);
+                
                 if (marketArgs.ChangetMarket.IsClose)
                 {
                     betFairScore = "END";
@@ -222,6 +194,21 @@ namespace Tennis_Betfair
                 prevPlayerOneScore = Player.toIntScore(marketArgs.ChangetMarket.ScoreNewOne);
                 prevPlayerTwoScore = Player.toIntScore(marketArgs.ChangetMarket.ScoreNewTwo);
             }));
+        }
+
+        private string CheckForNullScore(string score, Label labelToView)
+        {
+            switch (score)
+            {
+                case " : ":
+                    score = "No score";
+                    labelToView.Visible = true;
+                    break;
+                default:
+                    labelToView.Visible = false;
+                    break;
+            }
+            return score;
         }
 
         private void ClickPlayer(ScoreUpdEventArgs marketArgs)
@@ -349,7 +336,7 @@ namespace Tennis_Betfair
             var players = e.Node.Text.Split(':');
             var player1Node = players[0].Trim();
             var player2Node = players[1].Trim();
-            foreach (var market in _allMarkets.AllMarketsHashSet)
+            foreach (var market in _allMarkets.ParsingInfo.AllMarketsHashSet)
             {
                 //*Check event*/
                 if ((market.Player1.Name != player1Node)
@@ -359,7 +346,7 @@ namespace Tennis_Betfair
                 var eventId365 = market.Bet365EventId;
                 var eventIdSky = market.SkyBetEventId;
 
-                if ((eventIdBetfair == null) && (eventId365 == null)) _allMarkets.AllMarketsHashSet.Remove(market);
+                if ((eventIdBetfair == null) && (eventId365 == null)) _allMarkets.ParsingInfo.AllMarketsHashSet.Remove(market);
 
                 Debug.WriteLine("Event: " + eventId365 + " : " + eventIdBetfair);
 
@@ -389,29 +376,7 @@ namespace Tennis_Betfair
         {
         }
 
-        private void radioButtonAdv9_CheckChanged(object sender, EventArgs e)
-        {
-            _allMarkets.MarketIgnore(TypeDBO.Bet365);
-            var elem = _allMarkets.GetStatus();
-            getStateThread(elem);
-            //bet365
-        }
-
-        private void radioButtonAdv8_CheckChanged(object sender, EventArgs e)
-        {
-            _allMarkets.MarketIgnore(TypeDBO.BetFair); //
-            var elem = _allMarkets.GetStatus();
-            getStateThread(elem);
-        }
-
-        private void radioButtonAdv10_CheckChanged(object sender, EventArgs e)
-        {
-            _allMarkets.MarketIgnore(TypeDBO.None);
-            var elem = _allMarkets.GetStatus();
-
-            getStateThread(elem);
-            //not ignore
-        }
+      
 
         private void updateTextBoxWithState(TextBoxExt textBox, ThreadState state)
         {
@@ -510,6 +475,12 @@ namespace Tennis_Betfair
 
         private void checkBoxNotIgnore_CheckStateChanged(object sender, EventArgs e)
         {
+            if (checkBoxBetfair.Checked)
+                _allMarkets.MarketIgnore(TypeDBO.BetFair);
+            if (checkBoxBet365.Checked)
+                _allMarkets.MarketIgnore(TypeDBO.Bet365);
+            if (checkBoxSky.Checked)
+                _allMarkets.MarketIgnore(TypeDBO.SkyBet);
             if (checkBoxNotIgnore.Checked)
             {
                 checkBoxBet365.Checked = false;
@@ -520,29 +491,55 @@ namespace Tennis_Betfair
 
         private void checkBoxBetfair_CheckStateChanged(object sender, EventArgs e)
         {
-            if (checkBoxNotIgnore.Checked) checkBoxNotIgnore.Checked = false;
-            _allMarkets.MarketIgnore(TypeDBO.BetFair);
+            if (checkBoxBetfair.Checked)
+            {
+                _allMarkets.MarketIgnore(TypeDBO.BetFair);
+                checkBoxNotIgnore.Checked = false;
+            }
+            else
+            {
+                _allMarkets.UnMarketIngore(TypeDBO.BetFair);
+            }
             var elem = _allMarkets.GetStatus();
             getStateThread(elem);
         }
 
         private void checkBoxBet365_CheckStateChanged(object sender, EventArgs e)
         {
-            if (checkBoxNotIgnore.Checked) checkBoxNotIgnore.Checked = false;
-            _allMarkets.MarketIgnore(TypeDBO.Bet365);
+            if (checkBoxBet365.Checked)
+            {
+                _allMarkets.MarketIgnore(TypeDBO.Bet365);
+                checkBoxNotIgnore.Checked = false;
+            }
+            else
+            {
+                _allMarkets.UnMarketIngore(TypeDBO.Bet365);
+            }
             var elem = _allMarkets.GetStatus();
             getStateThread(elem);
         }
 
         private void checkBoxSky_CheckStateChanged(object sender, EventArgs e)
         {
-            if (checkBoxNotIgnore.Checked) checkBoxNotIgnore.Checked = false;
-            _allMarkets.MarketIgnore(TypeDBO.SkyBet);
+            if (checkBoxSky.Checked)
+            {
+                _allMarkets.MarketIgnore(TypeDBO.SkyBet);
+                checkBoxNotIgnore.Checked = false;
+            }
+            else
+            {
+                _allMarkets.UnMarketIngore(TypeDBO.SkyBet);
+            }
             var elem = _allMarkets.GetStatus();
             getStateThread(elem);
         }
 
         private void buttonAdv2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void checkBoxBetfair_CheckedChanged(object sender, EventArgs e)
         {
 
         }

@@ -71,19 +71,22 @@
     <Compile Include="Bet365.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Tennis Betfair\Tennis Betfair.csproj">
+    <ProjectReference Include="..\Tennis Betfair\Tennis Live Scores.csproj">
       <Project>{7c768ee4-2a8e-44a9-8192-f670b40fd3dc}</Project>
-      <Name>Tennis Betfair</Name>
+      <Name>Tennis Live Scores</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="LoadTest1.loadtest">
+    <None Include="LoadTests\LoadTest1.loadtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="LoadTestAll.loadtest">
+    <None Include="LoadTests\LoadTestSkyBet.loadtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="LoadTestBet365.loadtest">
+    <None Include="LoadTests\LoadTestAll.loadtest">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="LoadTests\LoadTestBet365.loadtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />

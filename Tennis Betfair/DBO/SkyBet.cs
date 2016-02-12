@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -23,44 +24,76 @@ namespace Tennis_Betfair.DBO
             var cells = rows[0].SelectNodes("./tr");
             foreach (var cell in cells)
             {
-                var html = cell.InnerHtml;
+                try
+                {
+                    var html = cell.InnerHtml;
 
-                if (!html.Contains("/tennis-live/event/"))
-                    continue;
-                var regexMathesEventId = Regex.Match(html, "(\\/)+([0-9]+)");
-                var regexNamePlayers = Regex.Match(html, "([>]*.*[v].*.[<])");
-                var eventId = regexMathesEventId.Value.Trim(new[] {'/'});
-                var players = regexNamePlayers.Value.Trim(new[] {' ', '<'});
-                var tmp = Regex.Match(players, "([A-z+-]\\w)+([A-z+-]*\\w)");
-                var player1 = "";
-                var player2 = "";
-                if (players.Contains("/"))
-                {
-                    //two players in team
-                    var team1 = tmp.Value + '/' + tmp.NextMatch().Value;
-                    var team2 = tmp.NextMatch().NextMatch().Value + '/' +
-                                tmp.NextMatch().NextMatch().NextMatch().Value;
-                    player1 = team1;
-                    player2 = team2;
+                    if (!html.Contains("/tennis-live/event/"))
+                        continue;
+                    var regexMathesEventId = Regex.Match(html, "(\\/)+([0-9]+)");
+                    var regexNamePlayers = Regex.Match(html, "([>]*.*[v].*.[<])");
+                    var eventId = regexMathesEventId.Value.Trim(new[] {'/'});
+                    var players = regexNamePlayers.Value.Trim(new[] {' ', '<'});
+
+                    var playersList = Regex.Split(players, " v ");
+
+                    var tmpOne = Regex.Split(playersList[0], ">");
+                    var tmpTwo = Regex.Split(playersList[1], ">");
+
+                    var plr1 = (tmpOne[tmpOne.Length - 1].Trim(' '));
+                    var plr2 = (tmpTwo[tmpTwo.Length - 1].Trim(' '));
+
+                    var player1 = "";
+                    var player2 = "";
+                    var isFirst = false;
+                    if (plr1.Contains("*"))
+                    {
+                        var tmpParse = plr1.Split('*');
+                        player1 = tmpParse[0].Length > tmpParse[1].Length ? tmpParse[0] : tmpParse[1];
+                        isFirst = true;
+                    }
+                    if (plr2.Contains("*"))
+                    {
+                        var tmpParse = plr2.Split('*');
+                        player2 = tmpParse[0].Length > tmpParse[1].Length ? tmpParse[0] : tmpParse[1];
+                    }
+                    if (isFirst)
+                    {
+                        player2 = RemoveDigit(plr2);
+                    }
+                    else
+                    {
+                        player1 = RemoveDigit(plr1);
+                    }
+                    player1 = player1.Trim();
+                    player2 = player2.Trim();
+                    inplayMarkets.Add(new MarketInfo(player1 + " : " + player2, player1, player2, eventId));
                 }
-                else
+                catch (Exception)
                 {
-                    //one player in team
-                    var team1 = tmp.Value + ' ' + tmp.NextMatch().Value;
-                    var team2 = tmp.NextMatch().NextMatch().Value + ' ' +
-                                tmp.NextMatch().NextMatch().NextMatch().Value;
-                    player1 = team1;
-                    player2 = team2;
-                }             
-                inplayMarkets.Add(new MarketInfo(player1 + " : " + player2, player1, player2, eventId));
+                    Debug.WriteLine("[SKYBET] Exeption parse in [GetMartches]");
+                    continue;
+                }
             }
             markets = inplayMarkets;
             return inplayMarkets;
         }
 
+        private string RemoveDigit(string strToClear)
+        {
+            string str = "";
+            for (int i = 0; i < strToClear.Length; i++)
+            {
+                if (!char.IsDigit(strToClear[i]))
+                {
+                    str += strToClear[i];
+                }
+            }
+            return str;
+        }
+
         public ScoreInfo GetScoreInfo(string eventIdSkyBet)
         {
-            //xpath = //*[@id='js-inner-content']/section[1]/table/tbody
             var doc = new HtmlWeb().Load("https://m.skybet.com/tennis/tennis-live/event/" + eventIdSkyBet);
             var rows = doc?.DocumentNode.SelectSingleNode("//*[@id='js-inner-content']/section[1]/table/tbody");
             if (rows == null) return null;

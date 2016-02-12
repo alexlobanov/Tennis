@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 using Tennis_Betfair.DBO.ParserBet365;
 using Tennis_Betfair.TO;
 
@@ -24,7 +19,8 @@ namespace Tennis_Betfair
             }
             catch (Exception exception)
             {
-                Debug.WriteLine("Connection problem with: " + dboType + " message" + exception.Message + " Data: " + exception.Data);
+                Debug.WriteLine("Connection problem with: " + dboType + " message" + exception.Message + " Data: " +
+                                exception.Data);
                 status = exception.Message;
                 return false;
             }
@@ -39,7 +35,8 @@ namespace Tennis_Betfair
             }
             catch (Exception exception)
             {
-                Debug.WriteLine("Connection problem with: " + dboType + " message" + exception.Message + " Data: " + exception.Data);
+                Debug.WriteLine("Connection problem with: " + dboType + " message" + exception.Message + " Data: " +
+                                exception.Data);
                 return false;
             }
         }
@@ -65,10 +62,10 @@ namespace Tennis_Betfair
                     port = "80";
                     break;
             }
-            var request = (HttpWebRequest)WebRequest.Create(address);
-            request.Timeout = 1000;
+            var request = (HttpWebRequest) WebRequest.Create(address);
+            request.Timeout = 2000;
             request.UserAgent = Parse.USER_AGENT;
-            var response = (HttpWebResponse)request.GetResponse();
+            var response = (HttpWebResponse) request.GetResponse();
 
             if (response.StatusCode != HttpStatusCode.OK) return false;
 
@@ -80,7 +77,6 @@ namespace Tennis_Betfair
                 if (responseFromServer.Length < 100) return false;
             }
             return true;
-         
         }
     }
 }

@@ -541,6 +541,7 @@ namespace Tennis_Betfair
             this.checkBoxBetfair.Text = "Betfair";
             this.checkBoxBetfair.ThemesEnabled = false;
             this.checkBoxBetfair.CheckStateChanged += new System.EventHandler(this.checkBoxBetfair_CheckStateChanged);
+            this.checkBoxBetfair.CheckedChanged += new System.EventHandler(this.checkBoxBetfair_CheckedChanged);
             // 
             // checkBoxBet365
             // 

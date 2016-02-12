@@ -27,7 +27,7 @@ namespace Tennis_Betfair.TO
 
         private ThreadStatus status;
 
-        public ThreadScore(string betfairId, string bet365Id, string skyBet, ref AllMarkets allMarkets)
+        public ThreadScore(string betfairId, string bet365Id, string skyBet, AllMarkets allMarkets)
         {
             this.betfairId = betfairId;
             this.bet365Id = bet365Id;
@@ -35,9 +35,9 @@ namespace Tennis_Betfair.TO
 
             this.allMarkets = allMarkets;
 
-            threadScore365 = new Thread(GetScore365);
-            threadBetfair = new Thread(GetScoreBetfair);
-            threadSkyBet = new Thread(GetScoreSkyBet);
+            threadScore365 = new Thread(GetScore);
+            threadBetfair = new Thread(GetScore);
+            threadSkyBet = new Thread(GetScore);
 
             threadScore365.Name = "BetScore365 " + bet365Id;
             threadBetfair.Name = "BetFair " + betfairId;
@@ -58,36 +58,12 @@ namespace Tennis_Betfair.TO
             {
                 case TypeDBO.BetFair:
                     threadBetfair.Suspend();
-                    if (threadScore365.ThreadState != ThreadState.Running)
-                    {
-                        threadScore365.Resume();
-                    }
-                    if (threadSkyBet.ThreadState != ThreadState.Running)
-                    {
-                        threadSkyBet.Resume();
-                    }
                     break;
                 case TypeDBO.Bet365:
                     threadScore365.Suspend();
-                    if (threadBetfair.ThreadState != ThreadState.Running)
-                    {
-                        threadBetfair.Resume();
-                    }
-                    if (threadSkyBet.ThreadState != ThreadState.Running)
-                    {
-                        threadSkyBet.Resume();
-                    }
                     break;
                 case TypeDBO.SkyBet:
                     threadSkyBet.Suspend();
-                    if (threadBetfair.ThreadState != ThreadState.Running)
-                    {
-                        threadBetfair.Resume();
-                    }
-                    if (threadScore365.ThreadState != ThreadState.Running)
-                    {
-                        threadScore365.Resume();
-                    }
                     break;
                 case TypeDBO.None:
                     if (threadBetfair.ThreadState != ThreadState.Running)
@@ -102,11 +78,27 @@ namespace Tennis_Betfair.TO
             }
         }
 
+        public void UnMarketIgnore(TypeDBO marketTypeDbo)
+        {
+            switch (marketTypeDbo)
+            {
+                case TypeDBO.BetFair:
+                    threadBetfair.Resume();
+                    break;
+                case TypeDBO.Bet365:
+                    threadScore365.Resume();
+                    break;
+                case TypeDBO.SkyBet:
+                    threadSkyBet.Resume();
+                    break;
+            }
+        }
+
         public void StartThreads()
         {
-            threadScore365.Start(bet365Id);
-            threadBetfair.Start(betfairId);
-            threadSkyBet.Start(skyBetId);
+            threadScore365.Start(new GetScoreStruct(TypeDBO.Bet365, bet365Id));
+            threadBetfair.Start(new GetScoreStruct(TypeDBO.BetFair, betfairId));
+            threadSkyBet.Start(new GetScoreStruct(TypeDBO.SkyBet, skyBetId));
         }
 
         public void StopThreads()
@@ -128,7 +120,7 @@ namespace Tennis_Betfair.TO
             try
             {
                 var hashset = new HashSet<Market>();
-                hashset = allMarkets.AllMarketsHashSet;
+                hashset = allMarkets.ParsingInfo.AllMarketsHashSet;
                 foreach (var market in hashset)
                 {
                     if ((market.Bet365EventId == bet365Id) || (market.BetfairEventId == betfairId) || (market.SkyBetEventId == skyBetId))
@@ -141,11 +133,11 @@ namespace Tennis_Betfair.TO
                                 isStop = true;
                             }
                         }
-                        if (bet365Id == null)
+                        if (string.IsNullOrEmpty(bet365Id))
                             bet365Id = market.Bet365EventId;
-                        if (betfairId == null)
+                        if (string.IsNullOrEmpty(betfairId))
                             betfairId = market.BetfairEventId;
-                        if (skyBetId == null)
+                        if (string.IsNullOrEmpty(skyBetId))
                             skyBetId = market.SkyBetEventId;
                     }
                 }
@@ -159,19 +151,20 @@ namespace Tennis_Betfair.TO
             }
         }
 
-        private void GetScoreSkyBet(object eventId)
+        private void GetScore(object info)
         {
+            var information = (GetScoreStruct) info;
             var count = 0;
             while (true)
             {
                 var result = false;
                 UpdateEventId();
                 if (isStop) return;
-                if ((string) eventId != null)
-                    result = allMarkets.GetScoreMarket((string) eventId, TypeDBO.SkyBet);
+                if ((string) information.EventId != null)
+                    result = allMarkets.GetScoreMarket((string) information.EventId, information.TypeDbo);
                 if (result)
                 {
-                    Thread.Sleep(350);
+                    Thread.Sleep(50);
                     count = 0;
                 }
                 else
@@ -179,59 +172,18 @@ namespace Tennis_Betfair.TO
                     count++;
                 }
                 if (count < 15) continue;
-                isPosibleStopSkyBet = true;
-                if ((isPosibleStop365) && (isPosibleStopBet) && (isPosibleStopSkyBet))
-                    isStop = true;
-            }
-        }
-
-        private void GetScoreBetfair(object eventId)
-        {
-            var count = 0;
-            while (true)
-            {
-                var result = false;
-                UpdateEventId();
-                if (isStop) return;
-                if ((string) eventId != null)
-                    result = allMarkets.GetScoreMarket((string) eventId, TypeDBO.BetFair);
-                if (result)
+                switch (information.TypeDbo)
                 {
-                    Thread.Sleep(350);
-                    count = 0;
+                    case TypeDBO.BetFair:
+                        isPosibleStopBet = true;
+                        break;
+                    case TypeDBO.Bet365:
+                        isPosibleStop365 = true;
+                        break;
+                    case TypeDBO.SkyBet:
+                        isPosibleStopSkyBet = true;
+                        break;
                 }
-                else
-                {
-                    count++;
-                }
-                if (count < 15) continue;
-                isPosibleStopBet = true;
-                if ((isPosibleStop365) && (isPosibleStopBet) && (isPosibleStopSkyBet))
-                    isStop = true;
-            }
-        }
-
-        private void GetScore365(object eventId)
-        {
-            var count = 0;
-            while (true)
-            {
-                var result = false;
-                UpdateEventId();
-                if (isStop) return;
-                if ((string) eventId != null)
-                    result = allMarkets.GetScoreMarket((string) eventId, TypeDBO.Bet365);
-                if (result)
-                {
-                    Thread.Sleep(350);
-                    count = 0;
-                }
-                else
-                {
-                    count++;
-                }
-                if (count < 15) continue;
-                isPosibleStop365 = true;
                 if ((isPosibleStop365) && (isPosibleStopBet) && (isPosibleStopSkyBet))
                     isStop = true;
             }
