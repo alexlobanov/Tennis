@@ -69,10 +69,39 @@ namespace Tennis_Betfair
             while (true)
             {
                 if (isStop) return;
-                pictureBox365.Image = CheckInternetConenction.CheckConnection(TypeDBO.Bet365) ? Properties.Resources.green : Properties.Resources.red;
-                pictureBoxBF.Image = CheckInternetConenction.CheckConnection(TypeDBO.BetFair) ? Properties.Resources.green : Properties.Resources.red;
-                pictureBoxSB.Image = CheckInternetConenction.CheckConnection(TypeDBO.SkyBet) ? Properties.Resources.green : Properties.Resources.red;
-                Thread.Sleep(60000);
+                if (CheckInternetConenction.CheckGoogle() != StatusInternet.Ok)
+                {
+                    ChangeImageConnection(pictureBox365, CheckInternetConenction.CheckConnection(TypeDBO.Bet365));
+                    ChangeImageConnection(pictureBoxBF, CheckInternetConenction.CheckConnection(TypeDBO.BetFair));
+                    ChangeImageConnection(pictureBoxSB, CheckInternetConenction.CheckConnection(TypeDBO.SkyBet));
+                    Thread.Sleep(10000);
+                }
+                else
+                {
+
+                    ChangeImageConnection(pictureBox365, CheckInternetConenction.CheckConnection(TypeDBO.Bet365));
+                    ChangeImageConnection(pictureBoxBF, CheckInternetConenction.CheckConnection(TypeDBO.BetFair));
+                    ChangeImageConnection(pictureBoxSB, CheckInternetConenction.CheckConnection(TypeDBO.SkyBet));
+                    Thread.Sleep(6000);
+                }
+            }
+        }
+
+        private void ChangeImageConnection(PictureBox picture, StatusInternet status)
+        {
+            switch (status)
+            {
+                case StatusInternet.Ok:
+                    picture.Image = Properties.Resources.green;
+                    break;
+                case StatusInternet.BigDelay:
+                    picture.Image = Properties.Resources.yellow;
+                    break;
+                case StatusInternet.NoAvirable:
+                    picture.Image = Properties.Resources.red;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(status), status, null);
             }
         }
 
@@ -118,7 +147,7 @@ namespace Tennis_Betfair
                     }
                     label11.Invoke(new Action(() => { label11.Text = Closed.Nodes.Count.ToString(); }));
                     textBoxExt5.Invoke(new Action(() => { getStateThread(elem); }));
-                    if ((elem?.State365 == ThreadState.Stopped) && (elem?.StateBetfair == ThreadState.Stopped) )
+                    if ((elem?.State365 == ThreadState.Stopped) && (elem?.StateBetfair == ThreadState.Stopped))
                     {
                         radioButtonAdv1.Invoke(new Action(() =>
                         {
@@ -163,14 +192,14 @@ namespace Tennis_Betfair
                 var betFairScore = marketArgs.ChangetMarket.GetBetfairS();
                 var bet365Score = marketArgs.ChangetMarket.Get365S();
                 var skybetScore = marketArgs.ChangetMarket.GetSkyBetS();
-                
+
                 digitalGauge1.Value = marketArgs.ChangetMarket.GetNewS();
                 textBoxMarket.Text = marketArgs.ChangetMarket.MarketName;
 
-                betFairScore = CheckForNullScore(betFairScore,labelBetfairInfo);
+                betFairScore = CheckForNullScore(betFairScore, labelBetfairInfo);
                 bet365Score = CheckForNullScore(bet365Score, labelBet365Info);
                 skybetScore = CheckForNullScore(skybetScore, labelSkyInfo);
-                
+
                 if (marketArgs.ChangetMarket.IsClose)
                 {
                     betFairScore = "END";
@@ -219,17 +248,13 @@ namespace Tennis_Betfair
                     break;
                 case 15:
                     if (radioButtonAdv1.Checked)
-                        if ((Player.toIntScore(marketArgs.ChangetMarket.ScoreNewOne) == 15)
-                            && (prevPlayerOneScore
-                                != Player.toIntScore(marketArgs.ChangetMarket.ScoreNewOne)))
+                        if ((Player.toIntScore(marketArgs.ChangetMarket.ScoreNewOne) == 15) && (prevPlayerOneScore != Player.toIntScore(marketArgs.ChangetMarket.ScoreNewOne)))
                         {
                             prevClickScore = 15;
                             SimulateMouseClick.DoMouseClick();
                         }
                     if (radioButtonAdv2.Checked)
-                        if ((Player.toIntScore(marketArgs.ChangetMarket.ScoreNewTwo) == 15)
-                            && (prevPlayerTwoScore
-                                != Player.toIntScore(marketArgs.ChangetMarket.ScoreNewTwo)))
+                        if ((Player.toIntScore(marketArgs.ChangetMarket.ScoreNewTwo) == 15) && (prevPlayerTwoScore != Player.toIntScore(marketArgs.ChangetMarket.ScoreNewTwo)))
                         {
                             prevClickScore = 15;
                             SimulateMouseClick.DoMouseClick();
@@ -237,17 +262,13 @@ namespace Tennis_Betfair
                     break;
                 case 30:
                     if (radioButtonAdv1.Checked)
-                        if ((Player.toIntScore(marketArgs.ChangetMarket.ScoreNewOne) == 30)
-                            && (prevPlayerOneScore
-                                != Player.toIntScore(marketArgs.ChangetMarket.ScoreNewOne)))
+                        if ((Player.toIntScore(marketArgs.ChangetMarket.ScoreNewOne) == 30) && (prevPlayerOneScore != Player.toIntScore(marketArgs.ChangetMarket.ScoreNewOne)))
                         {
                             prevClickScore = 30;
                             SimulateMouseClick.DoMouseClick();
                         }
                     if (radioButtonAdv2.Checked)
-                        if ((Player.toIntScore(marketArgs.ChangetMarket.ScoreNewTwo) == 30)
-                            && (prevPlayerTwoScore
-                                != Player.toIntScore(marketArgs.ChangetMarket.ScoreNewTwo)))
+                        if ((Player.toIntScore(marketArgs.ChangetMarket.ScoreNewTwo) == 30) && (prevPlayerTwoScore != Player.toIntScore(marketArgs.ChangetMarket.ScoreNewTwo)))
                         {
                             prevClickScore = 30;
                             SimulateMouseClick.DoMouseClick();
@@ -255,17 +276,13 @@ namespace Tennis_Betfair
                     break;
                 case 40:
                     if (radioButtonAdv1.Checked)
-                        if ((Player.toIntScore(marketArgs.ChangetMarket.ScoreNewOne) == 40)
-                            && (prevPlayerOneScore
-                                != Player.toIntScore(marketArgs.ChangetMarket.ScoreNewOne)))
+                        if ((Player.toIntScore(marketArgs.ChangetMarket.ScoreNewOne) == 40) && (prevPlayerOneScore != Player.toIntScore(marketArgs.ChangetMarket.ScoreNewOne)))
                         {
                             prevClickScore = 40;
                             SimulateMouseClick.DoMouseClick();
                         }
                     if (radioButtonAdv2.Checked)
-                        if ((Player.toIntScore(marketArgs.ChangetMarket.ScoreNewTwo) == 40)
-                            && (prevPlayerTwoScore
-                                != Player.toIntScore(marketArgs.ChangetMarket.ScoreNewTwo)))
+                        if ((Player.toIntScore(marketArgs.ChangetMarket.ScoreNewTwo) == 40) && (prevPlayerTwoScore != Player.toIntScore(marketArgs.ChangetMarket.ScoreNewTwo)))
                         {
                             prevClickScore = 40;
                             SimulateMouseClick.DoMouseClick();
@@ -273,17 +290,13 @@ namespace Tennis_Betfair
                     break;
                 case 50:
                     if (radioButtonAdv1.Checked)
-                        if ((Player.toIntScore(marketArgs.ChangetMarket.ScoreNewOne) == 50)
-                            && (prevPlayerOneScore
-                                != Player.toIntScore(marketArgs.ChangetMarket.ScoreNewOne)))
+                        if ((Player.toIntScore(marketArgs.ChangetMarket.ScoreNewOne) == 50) && (prevPlayerOneScore != Player.toIntScore(marketArgs.ChangetMarket.ScoreNewOne)))
                         {
                             prevClickScore = 50;
                             SimulateMouseClick.DoMouseClick();
                         }
                     if (radioButtonAdv2.Checked)
-                        if ((Player.toIntScore(marketArgs.ChangetMarket.ScoreNewTwo) == 50)
-                            && (prevPlayerTwoScore
-                                != Player.toIntScore(marketArgs.ChangetMarket.ScoreNewTwo)))
+                        if ((Player.toIntScore(marketArgs.ChangetMarket.ScoreNewTwo) == 50) && (prevPlayerTwoScore != Player.toIntScore(marketArgs.ChangetMarket.ScoreNewTwo)))
                         {
                             prevClickScore = 50;
                             SimulateMouseClick.DoMouseClick();
@@ -295,8 +308,7 @@ namespace Tennis_Betfair
 
         private void OnMarketChangedEvent(MarketUpdEventArgs eventArgs)
         {
-            var gameStr = eventArgs.ChangetMarket.Player1.Name +
-                          "  :  " + eventArgs.ChangetMarket.Player2.Name;
+            var gameStr = eventArgs.ChangetMarket.Player1.Name + "  :  " + eventArgs.ChangetMarket.Player2.Name;
             var isHaveElem = false;
             if (eventArgs.ChangetMarket.Player1.Name == null) return;
             for (var j = 0; j < Closed.Nodes.Count; j++)
@@ -339,8 +351,7 @@ namespace Tennis_Betfair
             foreach (var market in _allMarkets.ParsingInfo.AllMarketsHashSet)
             {
                 //*Check event*/
-                if ((market.Player1.Name != player1Node)
-                    && (market.Player2.Name != player2Node)) continue;
+                if ((market.Player1.Name != player1Node) && (market.Player2.Name != player2Node)) continue;
 
                 var eventIdBetfair = market.BetfairEventId;
                 var eventId365 = market.Bet365EventId;
@@ -350,9 +361,7 @@ namespace Tennis_Betfair
 
                 Debug.WriteLine("Event: " + eventId365 + " : " + eventIdBetfair);
 
-                CheckChange?.Invoke(
-                    new ChangedCheckEventArgs(eventIdBetfair, eventId365, eventIdSky)
-                    );
+                CheckChange?.Invoke(new ChangedCheckEventArgs(eventIdBetfair, eventId365, eventIdSky));
 
                 Debug.WriteLine("Ok-Invoke");
                 break;
@@ -376,7 +385,6 @@ namespace Tennis_Betfair
         {
         }
 
-      
 
         private void updateTextBoxWithState(TextBoxExt textBox, ThreadState state)
         {
@@ -470,7 +478,6 @@ namespace Tennis_Betfair
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
-
         }
 
         private void checkBoxNotIgnore_CheckStateChanged(object sender, EventArgs e)
@@ -536,12 +543,15 @@ namespace Tennis_Betfair
 
         private void buttonAdv2_Click(object sender, EventArgs e)
         {
-
         }
 
         private void checkBoxBetfair_CheckedChanged(object sender, EventArgs e)
         {
+        }
 
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            _allMarkets.AbortThreads();
         }
     }
 }

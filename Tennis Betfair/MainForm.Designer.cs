@@ -841,6 +841,7 @@ namespace Tennis_Betfair
             this.Name = "MainForm";
             this.Text = "Tennis";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
             ((System.ComponentModel.ISupportInitialize)(this.Closed)).EndInit();
             this.groupBox1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.radioButtonAdv2)).EndInit();

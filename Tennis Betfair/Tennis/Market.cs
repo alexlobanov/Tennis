@@ -89,12 +89,15 @@ namespace Tennis_Betfair
             var newScore = Player1.ScoreBetfair1 + " : " + Player2.ScoreBetfair1;
             if ((prevScoreBetfair == null) || (!prevScoreBetfair.Equals(newScore)) || (prevScoreBetfair == " : "))
             {
-                if ((betfairScoreTime.AddSeconds(2).CompareTo(DateTime.Now) <= 0) || (betfairScoreTime == DateTime.MinValue))
+                if ((betfairScoreTime.AddMilliseconds(3000).CompareTo(DateTime.Now) <= 0) || (betfairScoreTime == DateTime.MinValue))
                 {
-                    Debug.WriteLine("[BetFair]: " + newScore);
-                    betfairScoreTime = DateTime.Now;
-                    prevScoreBetfair = newScore;
-                    return prevScoreBetfair;
+                    if (!newScore.Equals(" : "))
+                    {
+                        Debug.WriteLine("[BetFair]: " + newScore);
+                        betfairScoreTime = DateTime.Now;
+                        prevScoreBetfair = newScore;
+                        return prevScoreBetfair;
+                    }
                 }
             }
             return string.IsNullOrEmpty(prevScoreBetfair) ? NO_SCORE : prevScoreBetfair;
@@ -109,12 +112,15 @@ namespace Tennis_Betfair
             var newScore = Player1.ScoreSkyBet + " : " + Player2.ScoreSkyBet;
             if ((prevScoreSkyBet == null) || (!prevScoreSkyBet.Equals(newScore)) || (prevScoreSkyBet == " : "))
             {
-                if ((skyBetScoreTime.AddSeconds(2).CompareTo(DateTime.Now) <= 0) || (skyBetScoreTime == DateTime.MinValue))
+                if ((skyBetScoreTime.AddMilliseconds(1000).CompareTo(DateTime.Now) <= 0) || (skyBetScoreTime == DateTime.MinValue))
                 {
-                    Debug.WriteLine("[SkyBet]: " + newScore);
-                    skyBetScoreTime = DateTime.Now;
-                    prevScoreSkyBet = newScore;
-                    return prevScoreSkyBet;
+                    if (!newScore.Equals(" : "))
+                    {
+                        Debug.WriteLine("[SkyBet]: " + newScore);
+                        skyBetScoreTime = DateTime.Now;
+                        prevScoreSkyBet = newScore;
+                        return prevScoreSkyBet;
+                    }
                 }
             }
             return string.IsNullOrEmpty(prevScoreSkyBet) ? NO_SCORE : prevScoreSkyBet;
@@ -128,12 +134,15 @@ namespace Tennis_Betfair
             var newScore = Player1.ScoreBet366 + " : " + Player2.ScoreBet366;
             if ((prevScore365 == null) || (!prevScore365.Equals(newScore)) || (prevScore365 == " : "))
             {
-                if ((bet365ScoreTime.AddSeconds(2).CompareTo(DateTime.Now) <= 0) || (bet365ScoreTime == DateTime.MinValue))
+                if ((bet365ScoreTime.AddMilliseconds(1500).CompareTo(DateTime.Now) <= 0) || (bet365ScoreTime == DateTime.MinValue))
                 {
-                    Debug.WriteLine("[Get365]: " + newScore);
-                    bet365ScoreTime = DateTime.Now;
-                    prevScore365 = newScore;
-                    return prevScore365;
+                    if (!newScore.Equals(" : "))
+                    {
+                        Debug.WriteLine("[Get365]: " + newScore);
+                        bet365ScoreTime = DateTime.Now;
+                        prevScore365 = newScore;
+                        return prevScore365;
+                    }
                 }
             }
             return string.IsNullOrEmpty(prevScore365) ? NO_SCORE : prevScore365;
@@ -145,14 +154,14 @@ namespace Tennis_Betfair
         /// <returns>Счёт со всех бирж</returns>
         public string GetNewS()
         {
-            var max = bet365ScoreTime;
+            var max = betfairScoreTime;
             TypeDBO typeMax = TypeDBO.BetFair;
-            if (max.CompareTo(bet365ScoreTime) < 0)
+            if ((max.CompareTo(bet365ScoreTime) < 0) && (prevScoreBetfair != " : "))
             {
                 max = bet365ScoreTime;
                 typeMax = TypeDBO.Bet365;
             }
-            if (max.CompareTo(skyBetScoreTime) < 0)
+            if ((max.CompareTo(skyBetScoreTime) < 0) && (prevScoreSkyBet != " : "))
             {
                 max = skyBetScoreTime;
                 typeMax = TypeDBO.SkyBet;

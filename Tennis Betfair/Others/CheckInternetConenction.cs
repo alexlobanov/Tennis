@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Net.NetworkInformation;
 using Tennis_Betfair.DBO.ParserBet365;
 using Tennis_Betfair.TO;
 
@@ -9,35 +10,81 @@ namespace Tennis_Betfair
 {
     public static class CheckInternetConenction
     {
-        public static bool CheckConnection(TypeDBO dboType, out string status)
+        public static StatusInternet CheckConnection(TypeDBO dboType, out string status)
         {
             try
             {
                 var result = Check(dboType);
                 status = "Ok";
-                return result;
+                return StatusInternet.Ok;
+            }
+            catch (WebException ex)
+            {
+                if (ex.Status == WebExceptionStatus.Timeout)
+                {
+                    status = ex.Message;
+                    return StatusInternet.BigDelay;
+                    
+                }
+                else
+                {
+                    status = ex.Message;
+                    return StatusInternet.NoAvirable;
+                }
             }
             catch (Exception exception)
             {
                 Debug.WriteLine("Connection problem with: " + dboType + " message" + exception.Message + " Data: " +
                                 exception.Data);
                 status = exception.Message;
-                return false;
+                return StatusInternet.NoAvirable;
             }
         }
 
-        public static bool CheckConnection(TypeDBO dboType)
+        public static StatusInternet CheckConnection(TypeDBO dboType)
         {
             try
             {
                 var result = Check(dboType);
-                return result;
+                return StatusInternet.Ok;
+            }
+            catch (WebException ex)
+            {
+                if (ex.Status == WebExceptionStatus.Timeout)
+                {
+                    return StatusInternet.BigDelay;
+
+                }
+                else
+                {
+                    return StatusInternet.NoAvirable;
+                }
             }
             catch (Exception exception)
             {
                 Debug.WriteLine("Connection problem with: " + dboType + " message" + exception.Message + " Data: " +
                                 exception.Data);
-                return false;
+                return StatusInternet.NoAvirable;
+            }
+        }
+
+        public static StatusInternet CheckGoogle()
+        {
+            Ping ping = new Ping();
+            var reply = ping.Send("google.com");
+            if (reply != null)
+                switch (reply.Status)
+                {
+                    case IPStatus.Success:
+                        return StatusInternet.Ok;
+                    case IPStatus.TimedOut:
+                        return  StatusInternet.BigDelay;
+                    default:
+                        return StatusInternet.NoAvirable;
+                }
+            else
+            {
+                return StatusInternet.NoAvirable;
             }
         }
 

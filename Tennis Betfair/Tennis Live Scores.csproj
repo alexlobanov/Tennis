@@ -104,6 +104,7 @@
     <Compile Include="Events\PlayerScoreUpdEventArgs.cs" />
     <Compile Include="Events\ScoreUpdEventArgs.cs" />
     <Compile Include="Events\UnCheckEventsArgs.cs" />
+    <Compile Include="Others\CheckUnhandledEx.cs" />
     <Compile Include="Others\LoadingAnimator.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -130,6 +131,7 @@
     <Compile Include="TO\GetScoreStruct.cs" />
     <Compile Include="TO\SkyBet\MarketInfo.cs" />
     <Compile Include="TO\SkyBet\ScoreInfo.cs" />
+    <Compile Include="TO\StatusInternet.cs" />
     <Compile Include="TO\ThreadScore.cs" />
     <Compile Include="TO\ThreadStatus.cs" />
     <Compile Include="TO\TypeDBO.cs" />

@@ -83,6 +83,10 @@ namespace Tennis_Betfair.Tennis
             _threadsScores.Last().MarketIgnore(eventIdType);
         }
 
+        /// <summary>
+        /// Возобновляет работу потоков которые обрабатывают рынок с идфикатором указанном в id;
+        /// </summary>
+        /// <param name="eventIdType">Индификатор рынка который следует возобновить</param>
         public void UnMarketIngore(TypeDBO evntIDType)
         {
             _threadsScores.Last().UnMarketIgnore(evntIDType);
@@ -120,6 +124,16 @@ namespace Tennis_Betfair.Tennis
             }
         }
 
+        /// <summary>
+        /// Принудительно завершает потоки обрабатывающие счёт рынков
+        /// </summary>
+        public void AbortThreads()
+        {
+            foreach (var threadsScore in _threadsScores)
+            {
+                threadsScore.AbortThreads();
+            }
+        }
 
         /// <summary>
         /// Получить все маркеты с рынков

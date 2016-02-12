@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using Tennis_Betfair.Tennis;
+using ThreadState = System.Threading.ThreadState;
 
 namespace Tennis_Betfair.TO
 {
@@ -108,9 +110,30 @@ namespace Tennis_Betfair.TO
 
         public void AbortThreads()
         {
-            threadBetfair.Abort();
-            threadScore365.Abort();
-            threadSkyBet.Abort();
+            try
+            {
+                threadBetfair.Abort();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("[ThreadScore Exeption]: " + ex.Message);
+            }
+            try
+            {
+                threadScore365.Abort();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("[ThreadScore Exeption]: " + ex.Message);
+            }
+            try
+            {
+                threadSkyBet.Abort();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("[ThreadScore Exeption]: " + ex.Message);
+            }
         }
 
 
