@@ -71,6 +71,45 @@ namespace Tennis_Betfair.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на function suscribeEventsScores() {
+        ///    $(&apos;.yellow.last.ml13-ScoreBoardColumn&apos;).bind(&quot;DOMSubtreeModified&quot;,function(){
+        ///        var players = $(&apos;.ml13-ScoreBoard_HeaderText&apos;);
+        ///        var playerOneName = players[0].textContent;
+        ///        var playerTwoName = players[1].textContent;
+        ///        var scores = $(&apos;.yellow.last.ml13-ScoreBoardColumn&apos;).children();
+        ///        var scoreOne = scores[1].textContent;
+        ///        var scoreTwo = scores[2].textContent;
+        ///        var playerOne = {
+        ///            name: playerOneName,
+        ///   [остаток строки не уместился]&quot;;.
+        /// </summary>
+        internal static string jsAllLoad {
+            get {
+                return ResourceManager.GetString("jsAllLoad", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на function getMarkets() {
+        ///    try {
+        ///        var jsonObj = [];
+        ///        $(&apos;#content &gt; div:nth-child(41) &gt; div:nth-child(2)&apos;).find(&quot;li&quot;).each(function() {
+        ///                var playersName = jQuery.trim(this.textContent).split(&quot; v &quot;);
+        ///                var player1Name = playersName[0];
+        ///                var player2Name = playersName[1];
+        ///                
+        ///                var symbol = &quot;*&quot;;
+        ///                if (player1Name.indexOf(symbol) &gt; -1)
+        ///                {
+        ///                    player1Name = player1Name.slic [остаток строки не уместился]&quot;;.
+        /// </summary>
+        internal static string jsAllLoadSkybet {
+            get {
+                return ResourceManager.GetString("jsAllLoadSkybet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap loader_transparent {

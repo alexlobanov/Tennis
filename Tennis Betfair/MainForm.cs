@@ -16,6 +16,7 @@ using System.Threading;
 using System.Windows.Forms;
 using Syncfusion.Windows.Forms;
 using Syncfusion.Windows.Forms.Tools;
+using Tennis_Betfair.DBO;
 using Tennis_Betfair.Events;
 using Tennis_Betfair.Tennis;
 using Tennis_Betfair.TO;
@@ -53,7 +54,8 @@ namespace Tennis_Betfair
 
             _allMarkets = new AllMarkets();
             Market.MarketChanged += OnMarketChangedEvent;
-            ParsingInfo.playerChanged += OnPlayerChanged;
+            ParsingInfo.PlayerChanged += OnPlayerChanged;
+            Bet365.PlayerChanged += OnPlayerChanged;
             AllMarkets.LoadedEvent += OnLoadedEvent;
 
             UiThread = new Thread(Start) {Name = "UiThread"};
@@ -351,13 +353,14 @@ namespace Tennis_Betfair
             foreach (var market in _allMarkets.ParsingInfo.AllMarketsHashSet)
             {
                 //*Check event*/
-                if ((market.Player1.Name != player1Node) && (market.Player2.Name != player2Node)) continue;
+                if ((!(market.Player1.Name.Equals(player1Node))) && (!(market.Player2.Name.Equals(player2Node))))
+                    continue;
 
                 var eventIdBetfair = market.BetfairEventId;
-                var eventId365 = market.Bet365EventId;
+                var eventId365 = player1Node + "|" + player2Node;
                 var eventIdSky = market.SkyBetEventId;
 
-                if ((eventIdBetfair == null) && (eventId365 == null)) _allMarkets.ParsingInfo.AllMarketsHashSet.Remove(market);
+                if ((eventIdBetfair == null) && (string.IsNullOrEmpty(eventId365)) && (eventIdSky == null)) _allMarkets.ParsingInfo.AllMarketsHashSet.Remove(market);
 
                 Debug.WriteLine("Event: " + eventId365 + " : " + eventIdBetfair);
 
@@ -552,6 +555,18 @@ namespace Tennis_Betfair
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             _allMarkets.AbortThreads();
+        }
+
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            
+
         }
     }
 }

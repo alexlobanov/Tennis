@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using Tennis_Betfair.TO;
 
 namespace Tennis_Betfair.DBO.ParserBet365
 {
@@ -45,8 +46,6 @@ namespace Tennis_Betfair.DBO.ParserBet365
 
                 }
             }
-           
-
             return responseFromServer;
         }
     }

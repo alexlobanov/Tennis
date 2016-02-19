@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using Tennis_Betfair.Tennis;
+using Tennis_Betfair.TO;
 using ThreadState = System.Threading.ThreadState;
 
-namespace Tennis_Betfair.TO
+namespace Tennis_Betfair.Tennis
 {
     public class ThreadScore
     {
@@ -37,11 +38,12 @@ namespace Tennis_Betfair.TO
 
             this.allMarkets = allMarkets;
 
-            threadScore365 = new Thread(GetScore);
+            allMarkets.GetScoreMarket(this.bet365Id, TypeDBO.Bet365);
+            //threadScore365 = new Thread(GetScore);
             threadBetfair = new Thread(GetScore);
             threadSkyBet = new Thread(GetScore);
 
-            threadScore365.Name = "BetScore365 " + bet365Id;
+        //    threadScore365.Name = "BetScore365 " + bet365Id;
             threadBetfair.Name = "BetFair " + betfairId;
             threadSkyBet.Name = "SkyBet " + skyBetId;
         }
@@ -98,9 +100,9 @@ namespace Tennis_Betfair.TO
 
         public void StartThreads()
         {
-            threadScore365.Start(new GetScoreStruct(TypeDBO.Bet365, bet365Id));
-            threadBetfair.Start(new GetScoreStruct(TypeDBO.BetFair, betfairId));
-            threadSkyBet.Start(new GetScoreStruct(TypeDBO.SkyBet, skyBetId));
+          //  threadScore365.Start(new GetScoreStruct(TypeDBO.Bet365, bet365Id));
+           // threadBetfair.Start(new GetScoreStruct(TypeDBO.BetFair, betfairId));
+           // threadSkyBet.Start(new GetScoreStruct(TypeDBO.SkyBet, skyBetId));
         }
 
         public void StopThreads()
@@ -187,7 +189,8 @@ namespace Tennis_Betfair.TO
                     result = allMarkets.GetScoreMarket((string) information.EventId, information.TypeDbo);
                 if (result)
                 {
-                    Thread.Sleep(50);
+                    if (information.TypeDbo != TypeDBO.SkyBet)
+                        Thread.Sleep(50);
                     count = 0;
                 }
                 else

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Tennis_Betfair.Events;
 using Tennis_Betfair.TO;
@@ -15,16 +16,24 @@ namespace Tennis_Betfair
         private string _scoreSkyBet;
 
 
-        public Player(string name, string score, bool isBetfair)
+        public Player(string name, string score, TypeDBO typeDbo)
         {
             Name = name;
-            if (isBetfair)
+            switch (typeDbo)
             {
-                _scoreBetfair = score;
-            }
-            else
-            {
-                _scoreBet365 = score;
+                case TypeDBO.None:
+                    break;
+                case TypeDBO.BetFair:
+                    _scoreBetfair = score;
+                    break;
+                case TypeDBO.Bet365:
+                    _scoreBet365 = score;
+                    break;
+                case TypeDBO.SkyBet:
+                    _scoreSkyBet = score;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(typeDbo), typeDbo, null);
             }
         }
 
@@ -50,11 +59,7 @@ namespace Tennis_Betfair
 
         public string ScoreSkyBet
         {
-            get
-            {
-                return _scoreSkyBet;
-                
-            }
+            get { return _scoreSkyBet; }
             set
             {
                 OnPropertyChanged();

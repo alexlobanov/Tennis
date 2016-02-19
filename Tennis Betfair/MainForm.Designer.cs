@@ -65,6 +65,7 @@ namespace Tennis_Betfair
             this.label6 = new System.Windows.Forms.Label();
             this.textBoxScoreBetfair = new Syncfusion.Windows.Forms.Tools.TextBoxExt();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.checkBoxBetfair = new Syncfusion.Windows.Forms.Tools.CheckBoxAdv();
             this.checkBoxBet365 = new Syncfusion.Windows.Forms.Tools.CheckBoxAdv();
             this.checkBoxNotIgnore = new Syncfusion.Windows.Forms.Tools.CheckBoxAdv();
@@ -90,6 +91,7 @@ namespace Tennis_Betfair
             this.label14 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.button2 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.Closed)).BeginInit();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.radioButtonAdv2)).BeginInit();
@@ -516,6 +518,8 @@ namespace Tennis_Betfair
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.button2);
+            this.groupBox4.Controls.Add(this.button1);
             this.groupBox4.Controls.Add(this.checkBoxBetfair);
             this.groupBox4.Controls.Add(this.checkBoxBet365);
             this.groupBox4.Controls.Add(this.checkBoxNotIgnore);
@@ -527,6 +531,16 @@ namespace Tennis_Betfair
             this.groupBox4.TabIndex = 17;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Ignore Information From:";
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(154, 15);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 11;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // checkBoxBetfair
             // 
@@ -825,6 +839,16 @@ namespace Tennis_Betfair
             this.label4.TabIndex = 0;
             this.label4.Text = "B365";
             // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(301, 14);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 12;
+            this.button2.Text = "button2";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -942,5 +966,7 @@ namespace Tennis_Betfair
         private System.Windows.Forms.PictureBox pictureBox365;
         private System.Windows.Forms.PictureBox pictureBoxBF;
         private System.Windows.Forms.PictureBox pictureBoxSB;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
     }
 }

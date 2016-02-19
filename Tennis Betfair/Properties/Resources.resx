@@ -121,6 +121,126 @@
   <data name="green" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\green.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="jsAllLoad" xml:space="preserve">
+    <value>function suscribeEventsScores() {
+    $('.yellow.last.ml13-ScoreBoardColumn').bind("DOMSubtreeModified",function(){
+        var players = $('.ml13-ScoreBoard_HeaderText');
+        var playerOneName = players[0].textContent;
+        var playerTwoName = players[1].textContent;
+        var scores = $('.yellow.last.ml13-ScoreBoardColumn').children();
+        var scoreOne = scores[1].textContent;
+        var scoreTwo = scores[2].textContent;
+        var playerOne = {
+            name: playerOneName,
+            score: scoreOne
+        }
+        var playerTwo = {
+            name: playerTwoName,
+            score: scoreTwo
+        }
+        var jsonObj = [];
+        jsonObj.push(playerOne);
+        jsonObj.push(playerTwo)
+        var str = JSON.stringify(jsonObj);
+        var tmp = 1 + '|' + str;
+        console.info(tmp);
+    });
+}
+ 
+ function clickToTennis() {
+    $('.ipo-Classification.sport_13').click();
+ }
+ 
+ function getScore() {
+    var players = $('.ml13-ScoreBoard_HeaderText');
+    var playerOneName = players[0].textContent;
+    var playerTwoName = players[1].textContent;
+    var scores = $('.yellow.last.ml13-ScoreBoardColumn').children();
+    var scoreOne = scores[1].textContent;
+    var scoreTwo = scores[2].textContent;
+    var playerOne = {
+        name: playerOneName,
+        score: scoreOne
+    }
+    var playerTwo = {
+        name: playerTwoName,
+        score: scoreTwo
+    }
+    var jsonObj = [];
+    jsonObj.push(playerOne);
+    jsonObj.push(playerTwo)
+    var str = JSON.stringify(jsonObj);
+    return str;
+ }
+ 
+ function getMathes() {
+    var jsonObj = [];
+    var len = $('.ipo-Fixture_Truncator').length;
+    var elems = $('.ipo-Fixture_Truncator');
+    var index = 0;
+    for (var i = 0; i &lt; len-2; i+=2)
+    {  
+        var player1 = elems[i].textContent;
+        var player2 = elems[i+1].textContent;
+        var players = {
+            player1Name: player1,
+            player2Name: player2,
+            indexToClick: index
+        }
+        jsonObj.push(players);
+        index++;
+    }
+    var str  = JSON.stringify(jsonObj);
+    return str;
+ }
+
+function clickToMathes(index) {
+    var elems =  $('.ipo-ViewSelectorContainer.ipo-ViewSelectorContainer_Cid-13');
+    if (elems == null){
+        return false;
+    }
+    var click = elems[index];
+    click.click();
+    return true;
+}</value>
+  </data>
+  <data name="jsAllLoadSkybet" xml:space="preserve">
+    <value>function getMarkets() {
+    try {
+        var jsonObj = [];
+        $('#content &gt; div:nth-child(41) &gt; div:nth-child(2)').find("li").each(function() {
+                var playersName = jQuery.trim(this.textContent).split(" v ");
+                var player1Name = playersName[0];
+                var player2Name = playersName[1];
+                
+                var symbol = "*";
+                if (player1Name.indexOf(symbol) &gt; -1)
+                {
+                    player1Name = player1Name.slice(0,player1Name.length-3);
+                    player2Name = player2Name.slice(2,player2Name.length);
+                }
+                else{
+                    player1Name = player1Name.slice(0,player1Name.length -2);
+                    player2Name = player2Name.slice(3,player2Name.length);
+                }
+                player1Name = jQuery.trim(player1Name);
+                player2Name = jQuery.trim(player2Name);
+                var eventId = player1Name + '|' + player2Name;
+                var game = {
+                    player1Name: player1Name,
+                    player2Name: player2Name,
+                    indexToClick: eventId
+                }
+                jsonObj.push(game);
+        });  
+        var str  = JSON.stringify(jsonObj);
+        return str;
+    }
+    catch (error) {
+        return "none";
+    }
+}</value>
+  </data>
   <data name="loader_transparent" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\loader-transparent.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

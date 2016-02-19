@@ -23,6 +23,9 @@ namespace Tennis_Betfair.Tennis
         private readonly Bet365Class _bet365Class;
         private readonly Betfair _betfair;
         private readonly SkyBet _skyBet;
+
+        private readonly Bet365 _bet365;
+        private readonly NewSkyBet _skyBetNew;
         //
 
         private readonly List<ThreadScore> _threadsScores;
@@ -35,6 +38,8 @@ namespace Tennis_Betfair.Tennis
             _betfair = new Betfair();
             _bet365Class = new Bet365Class();
             _skyBet = new SkyBet();
+            _bet365 = new Bet365();
+            _skyBetNew = new NewSkyBet();
             _threadsScores = new List<ThreadScore>(2);
             _parsingInfo = new ParsingInfo();
             MainForm.CheckChange += MainFormOnCheckChange;
@@ -102,7 +107,7 @@ namespace Tennis_Betfair.Tennis
             {
                 if (_threadsScores.Count > 0)
                 {
-                    return _threadsScores.Last().GetStatus();
+                    //return _threadsScores.Last().GetStatus();
                 }
                 return null;
             }
@@ -145,25 +150,33 @@ namespace Tennis_Betfair.Tennis
             switch (typeMarket)
             {
                 case TypeDBO.Bet365:
-                    {
-                        var bet365All = _bet365Class.GetInPlayAllMarkets();
+                {
+                    return true;
+                    /*   var bet365All = _bet365.GetAlllMathes();
                         if (bet365All == null) return false;
                         ParsingInfo.Parse(bet365All);
-                        return true;
-                    }
+                        return true;*/
+                }
                 case TypeDBO.BetFair:
-                    {
-                        var betfairAll = _betfair.GetInPlayAllMarkets();
+                {
+                    return true;
+                    /*  var betfairAll = _betfair.GetInPlayAllMarkets();
                         if (betfairAll == null) return false;
                         ParsingInfo.Parse(betfairAll);
-                        return true;
-                    }
+                        return true;*/
+                }
                 case TypeDBO.SkyBet:
                     {
-                        var skyBetAll = _skyBet.GetMartches();
+                        var skyBetAll = _skyBetNew.GetAlllMathes();
                         if (skyBetAll == null) return false;
                         ParsingInfo.Parse(skyBetAll);
                         return true;
+
+                        /*
+                        var skyBetAll = _skyBet.GetMartches();
+                        if (skyBetAll == null) return false;
+                        ParsingInfo.Parse(skyBetAll);
+                        return true;*/
                     }
                 default:
                     return false;
@@ -182,10 +195,21 @@ namespace Tennis_Betfair.Tennis
             {
                 case TypeDBO.Bet365:
                 {
-                    var bet365Return = _bet365Class.GetScoreEvent(eventId);
-                    if (bet365Return == null) return false;
-                    ParsingInfo.Parse(bet365Return);
-                    return true; 
+                    var bet365 = _bet365.SuscribeToScores(eventId);
+                    var currentScore = _bet365.GetCurrentScores();
+                    var currentScore2 = _bet365.GetCurrentScores();
+                    if ((currentScore == null) || (currentScore.Count == 0))
+                        if ((currentScore2 != null) && (currentScore2.Count != 0))
+                        {
+                            ParsingInfo.Parse(currentScore2);
+                            return true;
+                        }
+                        else
+                        {
+                            ParsingInfo.Parse(currentScore);
+                            return true;
+                        }
+                    return false; 
                 }
                 case TypeDBO.BetFair:
                 {
@@ -198,11 +222,8 @@ namespace Tennis_Betfair.Tennis
                 }
                 case TypeDBO.SkyBet:
                 {
-                    var skyBetReturn =
-                    _skyBet.GetScoreInfo(eventId);
-                    if (skyBetReturn?.EventId == null) return false;
-                    if ((skyBetReturn.Player1 == null) && (skyBetReturn.Player2 == null)) return false;
-                    ParsingInfo.Parse(skyBetReturn);
+                    var newSkyBetReturn = _skyBetNew.GetScoreses(eventId);
+                    ParsingInfo.Parse(newSkyBetReturn);
                     return true;
                 }
                 default:
