@@ -22,10 +22,17 @@ namespace Tennis_Betfair
 
         public static void DoMouseClick()
         {
-            //Call the imported function with the cursor's current position
-            var X = uint.Parse(Cursor.Position.X.ToString());
-            var Y = uint.Parse(Cursor.Position.Y.ToString());
-            mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, (IntPtr.Zero));
+            try
+            {
+                //Call the imported function with the cursor's current position
+                var X = uint.Parse(Cursor.Position.X.ToString());
+                var Y = uint.Parse(Cursor.Position.Y.ToString());
+                mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, (IntPtr.Zero));
+            }
+            catch (OverflowException ex)
+            {
+                MessageBox.Show("Click summulation error. Now supported only main display's click");
+            }
         }
     }
 }

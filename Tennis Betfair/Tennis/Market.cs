@@ -112,7 +112,7 @@ namespace Tennis_Betfair
             var newScore = Player1.ScoreSkyBet + " : " + Player2.ScoreSkyBet;
             if ((prevScoreSkyBet == null) || (!prevScoreSkyBet.Equals(newScore)) || (prevScoreSkyBet == " : "))
             {
-                if ((skyBetScoreTime.AddMilliseconds(1000).CompareTo(DateTime.Now) <= 0) || (skyBetScoreTime == DateTime.MinValue))
+                if ((skyBetScoreTime.AddMilliseconds(1).CompareTo(DateTime.Now) <= 0) || (skyBetScoreTime == DateTime.MinValue))
                 {
                     if (!newScore.Equals(" : "))
                     {
@@ -134,7 +134,7 @@ namespace Tennis_Betfair
             var newScore = Player1.ScoreBet366 + " : " + Player2.ScoreBet366;
             if ((prevScore365 == null) || (!prevScore365.Equals(newScore)) || (prevScore365 == " : "))
             {
-                if ((bet365ScoreTime.AddMilliseconds(1500).CompareTo(DateTime.Now) <= 0) || (bet365ScoreTime == DateTime.MinValue))
+                if ((bet365ScoreTime.AddMilliseconds(1).CompareTo(DateTime.Now) <= 0) || (bet365ScoreTime == DateTime.MinValue))
                 {
                     if (!newScore.Equals(" : "))
                     {

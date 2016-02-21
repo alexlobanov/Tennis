@@ -16,12 +16,12 @@ namespace Tennis_Betfair
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+         /*   Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
             //ловим все исключения
             Application.ThreadException += new ThreadExceptionEventHandler(
                 CheckUnhandledEx.ApplicationOnThreadException);
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(
-                CheckUnhandledEx.CurrentDomain_UnhandledException);
+                CheckUnhandledEx.CurrentDomain_UnhandledException);*/
 
             Application.Run(new MainForm());
         }

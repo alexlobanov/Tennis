@@ -33,6 +33,13 @@ namespace Tennis_Betfair.DBO
             return new ChromiumWebBrowser(SkyBetURL);
         }
 
+        public static ChromiumWebBrowser InitSkyBet(string URL)
+        {
+            skyBetChromiumWebBrowser.Dispose();
+            skyBetChromiumWebBrowser = new ChromiumWebBrowser(URL);
+            return skyBetChromiumWebBrowser;
+        }
+
         public static Chrome Instanse
         {
             get

@@ -51,24 +51,20 @@ namespace Tennis_Betfair
             this.radioButtonAdv4 = new Syncfusion.Windows.Forms.Tools.RadioButtonAdv();
             this.radioButtonAdv3 = new Syncfusion.Windows.Forms.Tools.RadioButtonAdv();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.groupBox7 = new System.Windows.Forms.GroupBox();
+            this.labelBet365Info = new System.Windows.Forms.Label();
             this.labelSkyInfo = new System.Windows.Forms.Label();
+            this.labelBetfairInfo = new System.Windows.Forms.Label();
             this.textBoxScoreSky = new Syncfusion.Windows.Forms.Tools.TextBoxExt();
             this.label13 = new System.Windows.Forms.Label();
-            this.labelBet365Info = new System.Windows.Forms.Label();
-            this.labelBetfairInfo = new System.Windows.Forms.Label();
             this.textBoxStatus = new Syncfusion.Windows.Forms.Tools.TextBoxExt();
-            this.textBoxMarket = new Syncfusion.Windows.Forms.Tools.TextBoxExt();
-            this.textBoxScoreBet365 = new Syncfusion.Windows.Forms.Tools.TextBoxExt();
             this.label9 = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.textBoxScoreBetfair = new Syncfusion.Windows.Forms.Tools.TextBoxExt();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.button1 = new System.Windows.Forms.Button();
             this.checkBoxBetfair = new Syncfusion.Windows.Forms.Tools.CheckBoxAdv();
             this.checkBoxBet365 = new Syncfusion.Windows.Forms.Tools.CheckBoxAdv();
-            this.checkBoxNotIgnore = new Syncfusion.Windows.Forms.Tools.CheckBoxAdv();
             this.checkBoxSky = new Syncfusion.Windows.Forms.Tools.CheckBoxAdv();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
@@ -91,7 +87,11 @@ namespace Tennis_Betfair
             this.label14 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.button2 = new System.Windows.Forms.Button();
+            this.splashControl1 = new Syncfusion.Windows.Forms.Tools.SplashControl();
+            this.textBoxScoreBet365 = new Syncfusion.Windows.Forms.Tools.TextBoxExt();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label15 = new System.Windows.Forms.Label();
+            this.label16 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.Closed)).BeginInit();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.radioButtonAdv2)).BeginInit();
@@ -104,15 +104,13 @@ namespace Tennis_Betfair
             ((System.ComponentModel.ISupportInitialize)(this.radioButtonAdv4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.radioButtonAdv3)).BeginInit();
             this.groupBox3.SuspendLayout();
+            this.groupBox7.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.textBoxScoreSky)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.textBoxStatus)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.textBoxMarket)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.textBoxScoreBet365)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.textBoxScoreBetfair)).BeginInit();
             this.groupBox4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.checkBoxBetfair)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.checkBoxBet365)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.checkBoxNotIgnore)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.checkBoxSky)).BeginInit();
             this.groupBox5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.textBoxExt9)).BeginInit();
@@ -126,6 +124,7 @@ namespace Tennis_Betfair
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSB)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxBF)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox365)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.textBoxScoreBet365)).BeginInit();
             this.SuspendLayout();
             // 
             // buttonAdv1
@@ -145,8 +144,9 @@ namespace Tennis_Betfair
             // 
             // Closed
             // 
-            this.Closed.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.Closed.BackColor = System.Drawing.Color.White;
             this.Closed.BeforeTouchSize = new System.Drawing.Size(282, 524);
+            this.Closed.Border3DStyle = System.Windows.Forms.Border3DStyle.Flat;
             this.Closed.BorderColor = System.Drawing.Color.PaleTurquoise;
             this.Closed.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.Closed.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(57)))), ((int)(((byte)(91)))));
@@ -163,11 +163,11 @@ namespace Tennis_Betfair
             this.Closed.Location = new System.Drawing.Point(0, 12);
             this.Closed.MetroColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(165)))), ((int)(((byte)(220)))));
             this.Closed.Name = "Closed";
-            this.Closed.SelectedNodeBackground = new Syncfusion.Drawing.BrushInfo(System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(235)))), ((int)(((byte)(251))))));
+            this.Closed.SelectedNodeBackground = new Syncfusion.Drawing.BrushInfo(System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(165)))), ((int)(((byte)(220))))));
             this.Closed.SelectedNodeForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(57)))), ((int)(((byte)(91)))));
             this.Closed.ShowFocusRect = false;
             this.Closed.Size = new System.Drawing.Size(282, 524);
-            this.Closed.Style = Syncfusion.Windows.Forms.Tools.TreeStyle.Office2007;
+            this.Closed.Style = Syncfusion.Windows.Forms.Tools.TreeStyle.Metro;
             this.Closed.TabIndex = 4;
             this.Closed.Text = "treeViewAdv1";
             this.Closed.ThemesEnabled = false;
@@ -349,16 +349,12 @@ namespace Tennis_Betfair
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.labelSkyInfo);
+            this.groupBox3.Controls.Add(this.groupBox7);
             this.groupBox3.Controls.Add(this.textBoxScoreSky);
             this.groupBox3.Controls.Add(this.label13);
-            this.groupBox3.Controls.Add(this.labelBet365Info);
-            this.groupBox3.Controls.Add(this.labelBetfairInfo);
             this.groupBox3.Controls.Add(this.textBoxStatus);
-            this.groupBox3.Controls.Add(this.textBoxMarket);
             this.groupBox3.Controls.Add(this.textBoxScoreBet365);
             this.groupBox3.Controls.Add(this.label9);
-            this.groupBox3.Controls.Add(this.label8);
             this.groupBox3.Controls.Add(this.label7);
             this.groupBox3.Controls.Add(this.label6);
             this.groupBox3.Controls.Add(this.textBoxScoreBetfair);
@@ -369,23 +365,59 @@ namespace Tennis_Betfair
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Game information";
             // 
+            // groupBox7
+            // 
+            this.groupBox7.Controls.Add(this.label16);
+            this.groupBox7.Controls.Add(this.label15);
+            this.groupBox7.Controls.Add(this.label8);
+            this.groupBox7.Controls.Add(this.labelBet365Info);
+            this.groupBox7.Controls.Add(this.labelSkyInfo);
+            this.groupBox7.Controls.Add(this.labelBetfairInfo);
+            this.groupBox7.Location = new System.Drawing.Point(169, 14);
+            this.groupBox7.Name = "groupBox7";
+            this.groupBox7.Size = new System.Drawing.Size(297, 99);
+            this.groupBox7.TabIndex = 14;
+            this.groupBox7.TabStop = false;
+            this.groupBox7.Text = "Information about game:";
+            // 
+            // labelBet365Info
+            // 
+            this.labelBet365Info.AutoSize = true;
+            this.labelBet365Info.ForeColor = System.Drawing.SystemColors.HotTrack;
+            this.labelBet365Info.Location = new System.Drawing.Point(76, 42);
+            this.labelBet365Info.Name = "labelBet365Info";
+            this.labelBet365Info.Size = new System.Drawing.Size(39, 13);
+            this.labelBet365Info.TabIndex = 10;
+            this.labelBet365Info.Text = "no info";
+            // 
             // labelSkyInfo
             // 
             this.labelSkyInfo.AutoSize = true;
-            this.labelSkyInfo.Location = new System.Drawing.Point(168, 81);
+            this.labelSkyInfo.ForeColor = System.Drawing.SystemColors.HotTrack;
+            this.labelSkyInfo.Location = new System.Drawing.Point(76, 70);
             this.labelSkyInfo.Name = "labelSkyInfo";
-            this.labelSkyInfo.Size = new System.Drawing.Size(269, 13);
+            this.labelSkyInfo.Size = new System.Drawing.Size(39, 13);
             this.labelSkyInfo.TabIndex = 13;
-            this.labelSkyInfo.Text = "No game information  on SkyBet.  Try to update market.";
+            this.labelSkyInfo.Text = "no info";
+            // 
+            // labelBetfairInfo
+            // 
+            this.labelBetfairInfo.AutoSize = true;
+            this.labelBetfairInfo.ForeColor = System.Drawing.SystemColors.HotTrack;
+            this.labelBetfairInfo.Location = new System.Drawing.Point(76, 17);
+            this.labelBetfairInfo.Name = "labelBetfairInfo";
+            this.labelBetfairInfo.Size = new System.Drawing.Size(39, 13);
+            this.labelBetfairInfo.TabIndex = 8;
+            this.labelBetfairInfo.Text = "no info";
             // 
             // textBoxScoreSky
             // 
             this.textBoxScoreSky.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(245)))), ((int)(((byte)(253)))));
-            this.textBoxScoreSky.BeforeTouchSize = new System.Drawing.Size(229, 20);
+            this.textBoxScoreSky.BeforeTouchSize = new System.Drawing.Size(67, 20);
             this.textBoxScoreSky.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(188)))), ((int)(((byte)(202)))), ((int)(((byte)(221)))));
             this.textBoxScoreSky.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBoxScoreSky.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.textBoxScoreSky.Location = new System.Drawing.Point(95, 77);
+            this.textBoxScoreSky.Location = new System.Drawing.Point(93, 84);
             this.textBoxScoreSky.Metrocolor = System.Drawing.Color.FromArgb(((int)(((byte)(209)))), ((int)(((byte)(211)))), ((int)(((byte)(212)))));
             this.textBoxScoreSky.Name = "textBoxScoreSky";
             this.textBoxScoreSky.Size = new System.Drawing.Size(67, 20);
@@ -396,97 +428,40 @@ namespace Tennis_Betfair
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(4, 77);
+            this.label13.Location = new System.Drawing.Point(6, 86);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(75, 13);
             this.label13.TabIndex = 11;
             this.label13.Text = "SkyBet Score:";
             // 
-            // labelBet365Info
-            // 
-            this.labelBet365Info.AutoSize = true;
-            this.labelBet365Info.Location = new System.Drawing.Point(168, 51);
-            this.labelBet365Info.Name = "labelBet365Info";
-            this.labelBet365Info.Size = new System.Drawing.Size(269, 13);
-            this.labelBet365Info.TabIndex = 10;
-            this.labelBet365Info.Text = "No game information  on Bet365.  Try to update market.";
-            // 
-            // labelBetfairInfo
-            // 
-            this.labelBetfairInfo.AutoSize = true;
-            this.labelBetfairInfo.Location = new System.Drawing.Point(168, 26);
-            this.labelBetfairInfo.Name = "labelBetfairInfo";
-            this.labelBetfairInfo.Size = new System.Drawing.Size(262, 13);
-            this.labelBetfairInfo.TabIndex = 8;
-            this.labelBetfairInfo.Text = "No game information  on Betfair. Try to update market.";
-            // 
             // textBoxStatus
             // 
             this.textBoxStatus.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(245)))), ((int)(((byte)(253)))));
-            this.textBoxStatus.BeforeTouchSize = new System.Drawing.Size(229, 20);
+            this.textBoxStatus.BeforeTouchSize = new System.Drawing.Size(67, 20);
             this.textBoxStatus.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(188)))), ((int)(((byte)(202)))), ((int)(((byte)(221)))));
             this.textBoxStatus.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBoxStatus.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.textBoxStatus.Location = new System.Drawing.Point(95, 136);
+            this.textBoxStatus.Location = new System.Drawing.Point(93, 120);
             this.textBoxStatus.Metrocolor = System.Drawing.Color.FromArgb(((int)(((byte)(209)))), ((int)(((byte)(211)))), ((int)(((byte)(212)))));
             this.textBoxStatus.Name = "textBoxStatus";
-            this.textBoxStatus.Size = new System.Drawing.Size(251, 20);
+            this.textBoxStatus.Size = new System.Drawing.Size(373, 20);
             this.textBoxStatus.Style = Syncfusion.Windows.Forms.Tools.TextBoxExt.theme.Office2010;
             this.textBoxStatus.TabIndex = 7;
             this.textBoxStatus.Text = "Game Status";
             // 
-            // textBoxMarket
-            // 
-            this.textBoxMarket.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(245)))), ((int)(((byte)(253)))));
-            this.textBoxMarket.BeforeTouchSize = new System.Drawing.Size(229, 20);
-            this.textBoxMarket.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(188)))), ((int)(((byte)(202)))), ((int)(((byte)(221)))));
-            this.textBoxMarket.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxMarket.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.textBoxMarket.Location = new System.Drawing.Point(95, 110);
-            this.textBoxMarket.Metrocolor = System.Drawing.Color.FromArgb(((int)(((byte)(209)))), ((int)(((byte)(211)))), ((int)(((byte)(212)))));
-            this.textBoxMarket.Name = "textBoxMarket";
-            this.textBoxMarket.Size = new System.Drawing.Size(251, 20);
-            this.textBoxMarket.Style = Syncfusion.Windows.Forms.Tools.TextBoxExt.theme.Office2010;
-            this.textBoxMarket.TabIndex = 6;
-            this.textBoxMarket.Text = "Market";
-            // 
-            // textBoxScoreBet365
-            // 
-            this.textBoxScoreBet365.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(245)))), ((int)(((byte)(253)))));
-            this.textBoxScoreBet365.BeforeTouchSize = new System.Drawing.Size(229, 20);
-            this.textBoxScoreBet365.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(188)))), ((int)(((byte)(202)))), ((int)(((byte)(221)))));
-            this.textBoxScoreBet365.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxScoreBet365.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.textBoxScoreBet365.Location = new System.Drawing.Point(95, 51);
-            this.textBoxScoreBet365.Metrocolor = System.Drawing.Color.FromArgb(((int)(((byte)(209)))), ((int)(((byte)(211)))), ((int)(((byte)(212)))));
-            this.textBoxScoreBet365.Name = "textBoxScoreBet365";
-            this.textBoxScoreBet365.Size = new System.Drawing.Size(67, 20);
-            this.textBoxScoreBet365.Style = Syncfusion.Windows.Forms.Tools.TextBoxExt.theme.Office2010;
-            this.textBoxScoreBet365.TabIndex = 5;
-            this.textBoxScoreBet365.Text = "Score2";
-            // 
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(6, 136);
+            this.label9.Location = new System.Drawing.Point(3, 121);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(40, 13);
             this.label9.TabIndex = 4;
             this.label9.Text = "Status:";
             // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(6, 111);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(74, 13);
-            this.label8.TabIndex = 3;
-            this.label8.Text = "Market Name:";
-            // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(4, 51);
+            this.label7.Location = new System.Drawing.Point(6, 56);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(75, 13);
             this.label7.TabIndex = 2;
@@ -495,7 +470,7 @@ namespace Tennis_Betfair
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(4, 26);
+            this.label6.Location = new System.Drawing.Point(6, 23);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(71, 13);
             this.label6.TabIndex = 1;
@@ -504,11 +479,11 @@ namespace Tennis_Betfair
             // textBoxScoreBetfair
             // 
             this.textBoxScoreBetfair.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(245)))), ((int)(((byte)(253)))));
-            this.textBoxScoreBetfair.BeforeTouchSize = new System.Drawing.Size(229, 20);
+            this.textBoxScoreBetfair.BeforeTouchSize = new System.Drawing.Size(67, 20);
             this.textBoxScoreBetfair.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(188)))), ((int)(((byte)(202)))), ((int)(((byte)(221)))));
             this.textBoxScoreBetfair.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBoxScoreBetfair.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.textBoxScoreBetfair.Location = new System.Drawing.Point(95, 25);
+            this.textBoxScoreBetfair.Location = new System.Drawing.Point(94, 23);
             this.textBoxScoreBetfair.Metrocolor = System.Drawing.Color.FromArgb(((int)(((byte)(209)))), ((int)(((byte)(211)))), ((int)(((byte)(212)))));
             this.textBoxScoreBetfair.Name = "textBoxScoreBetfair";
             this.textBoxScoreBetfair.Size = new System.Drawing.Size(67, 20);
@@ -518,11 +493,8 @@ namespace Tennis_Betfair
             // 
             // groupBox4
             // 
-            this.groupBox4.Controls.Add(this.button2);
-            this.groupBox4.Controls.Add(this.button1);
             this.groupBox4.Controls.Add(this.checkBoxBetfair);
             this.groupBox4.Controls.Add(this.checkBoxBet365);
-            this.groupBox4.Controls.Add(this.checkBoxNotIgnore);
             this.groupBox4.Controls.Add(this.checkBoxSky);
             this.groupBox4.Controls.Add(this.label1);
             this.groupBox4.Location = new System.Drawing.Point(12, 242);
@@ -532,21 +504,11 @@ namespace Tennis_Betfair
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Ignore Information From:";
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(154, 15);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 11;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
             // checkBoxBetfair
             // 
             this.checkBoxBetfair.BeforeTouchSize = new System.Drawing.Size(103, 21);
             this.checkBoxBetfair.DrawFocusRectangle = false;
-            this.checkBoxBetfair.Location = new System.Drawing.Point(6, 15);
+            this.checkBoxBetfair.Location = new System.Drawing.Point(28, 15);
             this.checkBoxBetfair.MetroColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(89)))), ((int)(((byte)(91)))));
             this.checkBoxBetfair.Name = "checkBoxBetfair";
             this.checkBoxBetfair.Size = new System.Drawing.Size(103, 21);
@@ -561,7 +523,7 @@ namespace Tennis_Betfair
             // 
             this.checkBoxBet365.BeforeTouchSize = new System.Drawing.Size(114, 21);
             this.checkBoxBet365.DrawFocusRectangle = false;
-            this.checkBoxBet365.Location = new System.Drawing.Point(115, 15);
+            this.checkBoxBet365.Location = new System.Drawing.Point(187, 15);
             this.checkBoxBet365.MetroColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(89)))), ((int)(((byte)(91)))));
             this.checkBoxBet365.Name = "checkBoxBet365";
             this.checkBoxBet365.Size = new System.Drawing.Size(114, 21);
@@ -571,25 +533,11 @@ namespace Tennis_Betfair
             this.checkBoxBet365.ThemesEnabled = false;
             this.checkBoxBet365.CheckStateChanged += new System.EventHandler(this.checkBoxBet365_CheckStateChanged);
             // 
-            // checkBoxNotIgnore
-            // 
-            this.checkBoxNotIgnore.BeforeTouchSize = new System.Drawing.Size(114, 21);
-            this.checkBoxNotIgnore.DrawFocusRectangle = false;
-            this.checkBoxNotIgnore.Location = new System.Drawing.Point(355, 15);
-            this.checkBoxNotIgnore.MetroColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(89)))), ((int)(((byte)(91)))));
-            this.checkBoxNotIgnore.Name = "checkBoxNotIgnore";
-            this.checkBoxNotIgnore.Size = new System.Drawing.Size(114, 21);
-            this.checkBoxNotIgnore.Style = Syncfusion.Windows.Forms.Tools.CheckBoxAdvStyle.Office2007;
-            this.checkBoxNotIgnore.TabIndex = 8;
-            this.checkBoxNotIgnore.Text = "Not ingnore";
-            this.checkBoxNotIgnore.ThemesEnabled = false;
-            this.checkBoxNotIgnore.CheckStateChanged += new System.EventHandler(this.checkBoxNotIgnore_CheckStateChanged);
-            // 
             // checkBoxSky
             // 
             this.checkBoxSky.BeforeTouchSize = new System.Drawing.Size(114, 21);
             this.checkBoxSky.DrawFocusRectangle = false;
-            this.checkBoxSky.Location = new System.Drawing.Point(235, 15);
+            this.checkBoxSky.Location = new System.Drawing.Point(352, 15);
             this.checkBoxSky.MetroColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(89)))), ((int)(((byte)(91)))));
             this.checkBoxSky.Name = "checkBoxSky";
             this.checkBoxSky.Size = new System.Drawing.Size(114, 21);
@@ -625,7 +573,7 @@ namespace Tennis_Betfair
             // textBoxExt9
             // 
             this.textBoxExt9.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(245)))), ((int)(((byte)(253)))));
-            this.textBoxExt9.BeforeTouchSize = new System.Drawing.Size(229, 20);
+            this.textBoxExt9.BeforeTouchSize = new System.Drawing.Size(67, 20);
             this.textBoxExt9.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(188)))), ((int)(((byte)(202)))), ((int)(((byte)(221)))));
             this.textBoxExt9.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBoxExt9.Cursor = System.Windows.Forms.Cursors.IBeam;
@@ -649,7 +597,7 @@ namespace Tennis_Betfair
             // textBoxExt6
             // 
             this.textBoxExt6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(245)))), ((int)(((byte)(253)))));
-            this.textBoxExt6.BeforeTouchSize = new System.Drawing.Size(229, 20);
+            this.textBoxExt6.BeforeTouchSize = new System.Drawing.Size(67, 20);
             this.textBoxExt6.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(188)))), ((int)(((byte)(202)))), ((int)(((byte)(221)))));
             this.textBoxExt6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBoxExt6.Cursor = System.Windows.Forms.Cursors.IBeam;
@@ -664,7 +612,7 @@ namespace Tennis_Betfair
             // textBoxExt5
             // 
             this.textBoxExt5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(245)))), ((int)(((byte)(253)))));
-            this.textBoxExt5.BeforeTouchSize = new System.Drawing.Size(229, 20);
+            this.textBoxExt5.BeforeTouchSize = new System.Drawing.Size(67, 20);
             this.textBoxExt5.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(188)))), ((int)(((byte)(202)))), ((int)(((byte)(221)))));
             this.textBoxExt5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBoxExt5.Cursor = System.Windows.Forms.Cursors.IBeam;
@@ -713,7 +661,7 @@ namespace Tennis_Betfair
             // textBoxExt8
             // 
             this.textBoxExt8.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(245)))), ((int)(((byte)(253)))));
-            this.textBoxExt8.BeforeTouchSize = new System.Drawing.Size(229, 20);
+            this.textBoxExt8.BeforeTouchSize = new System.Drawing.Size(67, 20);
             this.textBoxExt8.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(188)))), ((int)(((byte)(202)))), ((int)(((byte)(221)))));
             this.textBoxExt8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBoxExt8.Cursor = System.Windows.Forms.Cursors.IBeam;
@@ -729,7 +677,7 @@ namespace Tennis_Betfair
             // textBoxExt7
             // 
             this.textBoxExt7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(245)))), ((int)(((byte)(253)))));
-            this.textBoxExt7.BeforeTouchSize = new System.Drawing.Size(229, 20);
+            this.textBoxExt7.BeforeTouchSize = new System.Drawing.Size(67, 20);
             this.textBoxExt7.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(188)))), ((int)(((byte)(202)))), ((int)(((byte)(221)))));
             this.textBoxExt7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBoxExt7.Cursor = System.Windows.Forms.Cursors.IBeam;
@@ -839,15 +787,56 @@ namespace Tennis_Betfair
             this.label4.TabIndex = 0;
             this.label4.Text = "B365";
             // 
-            // button2
+            // splashControl1
             // 
-            this.button2.Location = new System.Drawing.Point(301, 14);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 12;
-            this.button2.Text = "button2";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.splashControl1.AutoModeDisableOwner = true;
+            this.splashControl1.FormIcon = ((System.Drawing.Icon)(resources.GetObject("splashControl1.FormIcon")));
+            this.splashControl1.HideHostForm = true;
+            this.splashControl1.HostForm = this;
+            this.splashControl1.SplashImage = global::Tennis_Betfair.Properties.Resources.tennis_promo;
+            this.splashControl1.TimerInterval = 5500;
+            // 
+            // textBoxScoreBet365
+            // 
+            this.textBoxScoreBet365.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(245)))), ((int)(((byte)(253)))));
+            this.textBoxScoreBet365.BeforeTouchSize = new System.Drawing.Size(67, 20);
+            this.textBoxScoreBet365.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(188)))), ((int)(((byte)(202)))), ((int)(((byte)(221)))));
+            this.textBoxScoreBet365.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxScoreBet365.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.textBoxScoreBet365.Location = new System.Drawing.Point(94, 54);
+            this.textBoxScoreBet365.Metrocolor = System.Drawing.Color.FromArgb(((int)(((byte)(209)))), ((int)(((byte)(211)))), ((int)(((byte)(212)))));
+            this.textBoxScoreBet365.Name = "textBoxScoreBet365";
+            this.textBoxScoreBet365.Size = new System.Drawing.Size(67, 20);
+            this.textBoxScoreBet365.Style = Syncfusion.Windows.Forms.Tools.TextBoxExt.theme.Office2010;
+            this.textBoxScoreBet365.TabIndex = 5;
+            this.textBoxScoreBet365.Text = "Score2";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(8, 17);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(62, 13);
+            this.label8.TabIndex = 14;
+            this.label8.Text = "from betfair:";
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(8, 42);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(66, 13);
+            this.label15.TabIndex = 15;
+            this.label15.Text = "from bet365:";
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(8, 70);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(64, 13);
+            this.label16.TabIndex = 16;
+            this.label16.Text = "from skybet:";
             // 
             // MainForm
             // 
@@ -866,6 +855,7 @@ namespace Tennis_Betfair
             this.Text = "Tennis";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
+            this.Load += new System.EventHandler(this.MainForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.Closed)).EndInit();
             this.groupBox1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.radioButtonAdv2)).EndInit();
@@ -879,16 +869,15 @@ namespace Tennis_Betfair
             ((System.ComponentModel.ISupportInitialize)(this.radioButtonAdv3)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            this.groupBox7.ResumeLayout(false);
+            this.groupBox7.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.textBoxScoreSky)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.textBoxStatus)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.textBoxMarket)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.textBoxScoreBet365)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.textBoxScoreBetfair)).EndInit();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.checkBoxBetfair)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.checkBoxBet365)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.checkBoxNotIgnore)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.checkBoxSky)).EndInit();
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
@@ -905,6 +894,7 @@ namespace Tennis_Betfair
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSB)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxBF)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox365)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.textBoxScoreBet365)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -926,10 +916,7 @@ namespace Tennis_Betfair
         private Syncfusion.Windows.Forms.Tools.RadioButtonAdv radioButtonAdv3;
         private System.Windows.Forms.GroupBox groupBox3;
         private Syncfusion.Windows.Forms.Tools.TextBoxExt textBoxStatus;
-        private Syncfusion.Windows.Forms.Tools.TextBoxExt textBoxMarket;
-        private Syncfusion.Windows.Forms.Tools.TextBoxExt textBoxScoreBet365;
         private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label6;
         private Syncfusion.Windows.Forms.Tools.TextBoxExt textBoxScoreBetfair;
@@ -952,7 +939,6 @@ namespace Tennis_Betfair
         private System.Windows.Forms.Label labelSkyInfo;
         private Syncfusion.Windows.Forms.Tools.TextBoxExt textBoxScoreSky;
         private System.Windows.Forms.Label label13;
-        private Syncfusion.Windows.Forms.Tools.CheckBoxAdv checkBoxNotIgnore;
         private Syncfusion.Windows.Forms.Tools.CheckBoxAdv checkBoxSky;
         private Syncfusion.Windows.Forms.Tools.TextBoxExt textBoxExt9;
         private System.Windows.Forms.Label label12;
@@ -966,7 +952,11 @@ namespace Tennis_Betfair
         private System.Windows.Forms.PictureBox pictureBox365;
         private System.Windows.Forms.PictureBox pictureBoxBF;
         private System.Windows.Forms.PictureBox pictureBoxSB;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.GroupBox groupBox7;
+        private Syncfusion.Windows.Forms.Tools.SplashControl splashControl1;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Label label8;
+        private Syncfusion.Windows.Forms.Tools.TextBoxExt textBoxScoreBet365;
     }
 }

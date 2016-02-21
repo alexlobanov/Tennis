@@ -11,6 +11,12 @@ namespace Tennis_Betfair.TO
             StateSky = stateSky;
         }
 
+
+        public ThreadStatus(ThreadState stateBetfair)
+        {
+            StateBetfair = stateBetfair;
+        }
+
         public ThreadState StateSky { get; set; }
 
         public ThreadState StateBetfair { get; set; }

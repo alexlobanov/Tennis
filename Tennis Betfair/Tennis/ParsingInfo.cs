@@ -18,7 +18,7 @@ namespace Tennis_Betfair.Tennis
     {
         private static readonly object ObjectTolock = new object();
         private static readonly object LockMarkets = new object();
-        private readonly HashSet<Market> _allMarkets;
+        private HashSet<Market> _allMarkets;
 
         public ParsingInfo()
         {
@@ -66,24 +66,15 @@ namespace Tennis_Betfair.Tennis
 
             if (objectToParse is List<GetScore>)
             {
-                lock (ObjectTolock)
-                {
-                    ParseAllData(betfairSingleData: (List<GetScore>) objectToParse);
-                }
+                ParseAllData(betfairSingleData: (List<GetScore>) objectToParse);
             }
             if (objectToParse is List<Scores>)
             {
-                lock (ObjectTolock)
-                {
-                    ParseAllData(b365SingleData: (List<Scores>) objectToParse);
-                }
+                ParseAllData(b365SingleData: (List<Scores>) objectToParse);
             }
             if (objectToParse is List<TO.NewSkyBet.Scores>)
             {
-                lock (ObjectTolock)
-                {
-                    ParseAllData(skyBetSingleData: (List<TO.NewSkyBet.Scores>) objectToParse);
-                }
+                ParseAllData(skyBetSingleData: (List<TO.NewSkyBet.Scores>) objectToParse);
             }
             
         }
@@ -213,8 +204,18 @@ namespace Tennis_Betfair.Tennis
                 foreach (var skyBetResponse in skyBetAllInfo)
                 {
                     var name = "";
-                    var player1 = skyBetResponse.player1Name;
-                    var player2 = skyBetResponse.player2Name;
+                    var player1 = skyBetResponse.player1Name.Trim();
+                    var player2 = skyBetResponse.player2Name.Trim();
+                    if (player1.Contains("/"))
+                    {
+                        var tmpArray = player1.Split('/');
+                        player1 = tmpArray[0].Trim() + "/" + tmpArray[1].Trim();
+                    }
+                    if (player2.Contains("/"))
+                    {
+                        var tmpArray = player2.Split('/');
+                        player2 = tmpArray[0].Trim() + "/" + tmpArray[1].Trim();
+                    }
                     var eventId = skyBetResponse.eventId;
                     var flag = false;
                     foreach (var allMarket in AllMarketsHashSet.Where(allMarket
@@ -336,19 +337,19 @@ namespace Tennis_Betfair.Tennis
         /// <param name="skyBetSingleData">Вся полученная информация с рынка skyBet</param>
         private void ParseAllData(List<TO.NewSkyBet.Scores> skyBetSingleData)
         {
-           /* var count = 0;
+            var count = 0;
             try
             {
-                var eventId = skyBetSingleData;
+                var eventId = skyBetSingleData[0].eventId;
                 foreach (var allMarket in AllMarketsHashSet)
                 {
                     if (allMarket.SkyBetEventId != null
                         && allMarket.SkyBetEventId.Equals(eventId))
                     {
                         allMarket.Player1.ScoreSkyBet =
-                            skyBetSingleData.ScoreFirst;
+                            skyBetSingleData[1].score;
                         allMarket.Player2.ScoreSkyBet =
-                            skyBetSingleData.ScoreSecond;
+                            skyBetSingleData[2].score;
                         allMarket.SkyBetEventId = eventId;
                         PlayerChanged?.Invoke(new ScoreUpdEventArgs(allMarket));
                         break;
@@ -363,7 +364,7 @@ namespace Tennis_Betfair.Tennis
                 {
                     throw new Exception("Ошибка в обработке маркетов");
                 }
-            }*/
+            }
         }
         private class MarketEqualityComparer : IEqualityComparer<Market>
         {

@@ -123,6 +123,10 @@
   </data>
   <data name="jsAllLoad" xml:space="preserve">
     <value>function suscribeEventsScores() {
+    if ($('.yellow.last.ml13-ScoreBoardColumn').length == 0)
+        return false;
+    if ($('.ml13-Anims_H3Text').length == 0)
+        return false;
     $('.yellow.last.ml13-ScoreBoardColumn').bind("DOMSubtreeModified",function(){
         var players = $('.ml13-ScoreBoard_HeaderText');
         var playerOneName = players[0].textContent;
@@ -145,7 +149,28 @@
         var tmp = 1 + '|' + str;
         console.info(tmp);
     });
+    $('.ml13-Anims_H3Text').bind("DOMSubtreeModified",function(){
+        var text = $('.ml13-Anims_H3Text');
+        var player1 = text[0].textContent;
+        var player2 = text[1].textContent;
+        var str = "2"+"/" + player1 + "|" + player2;
+        if ((player1 == null) &amp;&amp; (player2 == null))
+            return false;
+        console.log(str);
+    });
 }
+ 
+function checkLoad() { 
+    try {
+        if ($('.yellow.last.ml13-ScoreBoardColumn').length == 1)
+        {
+            return true;
+        }
+        return false;
+    } catch (error) {
+        return false;
+    }
+ }
  
  function clickToTennis() {
     $('.ipo-Classification.sport_13').click();
@@ -173,7 +198,7 @@
     return str;
  }
  
- function getMathes() {
+ function getMatches() {
     var jsonObj = [];
     var len = $('.ipo-Fixture_Truncator').length;
     var elems = $('.ipo-Fixture_Truncator');
@@ -205,14 +230,15 @@ function clickToMathes(index) {
 }</value>
   </data>
   <data name="jsAllLoadSkybet" xml:space="preserve">
-    <value>function getMarkets() {
+    <value>function getMarkets() { 
     try {
+        console.log("Я тут");
         var jsonObj = [];
-        $('#content &gt; div:nth-child(41) &gt; div:nth-child(2)').find("li").each(function() {
+        $('#content &gt; div:nth-child(41) &gt; div:nth-child(2)').find("li").each(function() 
+        {
                 var playersName = jQuery.trim(this.textContent).split(" v ");
                 var player1Name = playersName[0];
                 var player2Name = playersName[1];
-                
                 var symbol = "*";
                 if (player1Name.indexOf(symbol) &gt; -1)
                 {
@@ -225,11 +251,12 @@ function clickToMathes(index) {
                 }
                 player1Name = jQuery.trim(player1Name);
                 player2Name = jQuery.trim(player2Name);
-                var eventId = player1Name + '|' + player2Name;
+                var parseEventId = jQuery.trim($(this.children[0]).attr('href')).split("/");
+                var eventId = parseEventId[4];
                 var game = {
                     player1Name: player1Name,
                     player2Name: player2Name,
-                    indexToClick: eventId
+                    eventId: eventId
                 }
                 jsonObj.push(game);
         });  
@@ -237,15 +264,142 @@ function clickToMathes(index) {
         return str;
     }
     catch (error) {
-        return "none";
+        return "none  :" + error ;
     }
-}</value>
+}
+
+function checkLoad() { 
+    try {
+        if ($('.twitter-feed__items').length == 1)
+        {
+            return true;
+        }
+        return false;
+    } catch (error) {
+        return false;
+    }
+ }
+
+var prevScoreOne = "";
+var prevScoreTwo = "";
+var isFirst = true;
+function suscribeEventsScoresSkyBet() {
+    $('.point.points').bind("DOMSubtreeModified",function(){
+        var players = $('.current')[1].textContent;
+        var tmpArray = jQuery.trim(players).split(" v ");
+        var player1 = jQuery.trim(tmpArray[0]);
+        var player2 = jQuery.trim(tmpArray[1]);
+        var scores = $('.point.points');
+        var score1 = scores[0].textContent;
+        var score2 = scores[1].textContent;
+        if ((score1 == '') || (score2 == '')) 
+        {
+            console.log("Empy: + " + score1 + ":" + score2);
+            return "null1";
+        }
+        if (!isFirst)
+        {
+            if (((prevScoreOne != '0') || (prevScoreTwo != '0')) &amp;&amp; ( (prevScoreOne == "") || (prevScoreTwo == "")))
+            {
+                if ((score1 == '0') || (score2 == '0'))
+                {
+                    console.log("Empy2 currentScore = " + score1 + ":" + score2 + "PrevScore: " + prevScoreOne + ":" + prevScoreTwo);
+                    return "null2"
+                }
+            }
+        }
+        isFirst = false;
+        var parseEventId = jQuery.trim(window.location.pathname).split("/");
+        var eventId = 
+        {
+            eventId: parseEventId[4]
+        }
+        var jsonObj = [];
+        var playerOne = {
+            playerName: player1,
+            score: score1
+        }
+        var playerTwo = {
+            playerName: player2,
+            score: score2
+        }
+        jsonObj.push(eventId);
+        jsonObj.push(playerOne);
+        jsonObj.push(playerTwo)
+        prevScoreOne = score1;
+        prevScoreTwo = score2;
+        var str = JSON.stringify(jsonObj);
+        var tmp = 1 + '|' + str;
+        console.info(tmp);
+    });
+    $('.scoreboard-header.no-bg.no-border.cell-highlight').first().bind("DOMSubtreeModified",function(){
+        var infoMarket = $('.scoreboard-header.no-bg.no-border.cell-highlight').first().text()
+        if (infoMarket == "") return false;
+        var str = 2 + "|" + infoMarket;
+        console.log(str);
+    });
+}
+
+function getCurrentScore() {
+    var players = $('.current')[1].textContent;
+    var tmpArray = jQuery.trim(players).split(" v ");
+    var player1 = jQuery.trim(tmpArray[0]);
+    var player2 = jQuery.trim(tmpArray[1]);
+    var scores = $('.point.points');
+    var score1 = scores[0].textContent;
+    var score2 = scores[1].textContent;
+    var eventId = window.location.pathname;
+    if ((score1 == '') || (score2 == '')) 
+        return "null";
+    if (((prevScoreOne != '0') || (prevScoreTwo != '0')) &amp;&amp; ( (prevScoreOne != "") || (prevScoreTwo != "")))
+    {
+        if ((score1 == '0') || (score2 == '0'))
+            return "null"
+    }
+    var parseEventId = jQuery.trim(window.location.pathname).split("/");
+    var eventId = 
+    {
+        eventId: parseEventId[4]
+    };
+    var jsonObj = [];
+    var playerOne = {
+        playerName: player1,
+        score: score1,
+    }
+    var playerTwo = {
+        playerName: player2,
+        score: score2
+    }
+    jsonObj.push(eventId);
+    jsonObj.push(playerOne);
+    jsonObj.push(playerTwo)
+    prevScoreOne = score1;
+    prevScoreTwo = score2;
+    var str = JSON.stringify(jsonObj);
+    return str;
+}
+
+
+function checkLoaded() { 
+     try {
+        if ($('.promotions--list.js-accountbar-promotions-list').length == 1)
+        {
+            return true;
+        }
+        return false;
+    } catch (error) {
+        return false;
+    }
+ }</value>
   </data>
   <data name="loader_transparent" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\loader-transparent.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="red" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\red.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="tennis_promo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\tennis-promo.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="yellow" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\yellow.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

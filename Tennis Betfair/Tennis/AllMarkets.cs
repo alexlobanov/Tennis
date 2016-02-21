@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Windows.Forms;
 using Tennis_Betfair.DBO;
 using Tennis_Betfair.Events;
 using Tennis_Betfair.TO;
@@ -13,16 +14,15 @@ namespace Tennis_Betfair.Tennis
     {
         public delegate void LoadedEventHandler(LoadedEventArgs loadedEvent);
         public delegate void PlayerChanged(ScoreUpdEventArgs player);
-       
+
+        public bool isStop = false;
         /// <summary>
         /// Евент вызываеммый для отображения полосы загрузки
         /// </summary>
         public static event LoadedEventHandler LoadedEvent;
 
         //
-        private readonly Bet365Class _bet365Class;
         private readonly Betfair _betfair;
-        private readonly SkyBet _skyBet;
 
         private readonly Bet365 _bet365;
         private readonly NewSkyBet _skyBetNew;
@@ -36,12 +36,13 @@ namespace Tennis_Betfair.Tennis
         public AllMarkets()
         {
             _betfair = new Betfair();
-            _bet365Class = new Bet365Class();
-            _skyBet = new SkyBet();
-            _bet365 = new Bet365();
-            _skyBetNew = new NewSkyBet();
+
+            _bet365 = new Bet365(this);
+            _skyBetNew = new NewSkyBet(this);
+
             _threadsScores = new List<ThreadScore>(2);
             _parsingInfo = new ParsingInfo();
+
             MainForm.CheckChange += MainFormOnCheckChange;
             
         }
@@ -65,19 +66,30 @@ namespace Tennis_Betfair.Tennis
         /// </summary>
         public void StartThreads()
         {
+            LoadedEvent?.Invoke(new LoadedEventArgs(true, false));
             var thread = new Thread(() =>
-            {
-                LoadedEvent?.Invoke(new LoadedEventArgs(true, false));
+            {;
                 //Load all markets
                 GetAll(TypeDBO.BetFair);
                 GetAll(TypeDBO.Bet365);
                 GetAll(TypeDBO.SkyBet);
                 //End load markets
-                LoadedEvent?.Invoke(new LoadedEventArgs(false, true));
             });
             thread.Start();
+            while (true)
+            {
+                if (isStop)
+                    return;
+                if ((NewSkyBet.isLoad) && (Bet365.isLoad))
+                    break;
+                Application.DoEvents();
+                Thread.Sleep(100);
+            }
+            LoadedEvent?.Invoke(new LoadedEventArgs(false, true));
         }
 
+        private string saveSkyBetId;
+        private string saveBet365Id;
 
         /// <summary>
         /// Приостанавливает потоки которые обрабатывают рынок с идфикатором указанном в id;
@@ -85,7 +97,32 @@ namespace Tennis_Betfair.Tennis
         /// <param name="eventIdType">Индификатор рынка который следует приостоновить</param>
         public void MarketIgnore(TypeDBO eventIdType)
         {
-            _threadsScores.Last().MarketIgnore(eventIdType);
+            switch (eventIdType)
+            {
+                case TypeDBO.None:
+                    _skyBetNew.IsIgnoredMarket = false;
+                    if (!string.IsNullOrEmpty(saveSkyBetId))
+                        GetScoreMarket(saveSkyBetId, TypeDBO.SkyBet);
+
+                    _bet365.IsIgnoredMarket = false; //new version
+                    if (!string.IsNullOrEmpty(saveBet365Id))
+                        GetScoreMarket(saveBet365Id, TypeDBO.Bet365);
+
+                    _threadsScores.Last().UnMarketIgnore(eventIdType); //old version
+                    break;
+                case TypeDBO.BetFair:
+                    _threadsScores.Last().MarketIgnore(eventIdType); //old
+                    break;
+                case TypeDBO.Bet365:
+                    _bet365.IsIgnoredMarket = true; //new version
+                    break;
+                case TypeDBO.SkyBet:
+                    _skyBetNew.IsIgnoredMarket = true;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(eventIdType), eventIdType, null);
+            }
+           // _threadsScores.Last().MarketIgnore(eventIdType);
         }
 
         /// <summary>
@@ -94,7 +131,26 @@ namespace Tennis_Betfair.Tennis
         /// <param name="eventIdType">Индификатор рынка который следует возобновить</param>
         public void UnMarketIngore(TypeDBO evntIDType)
         {
-            _threadsScores.Last().UnMarketIgnore(evntIDType);
+            switch (evntIDType)
+            {
+                case TypeDBO.None:
+                    break;
+                case TypeDBO.BetFair:
+                    _threadsScores.Last().UnMarketIgnore(evntIDType);
+                    break;
+                case TypeDBO.Bet365:
+                    _bet365.IsIgnoredMarket = false; //new version
+                    if (!string.IsNullOrEmpty(saveBet365Id))
+                        GetScoreMarket(saveBet365Id, TypeDBO.Bet365);
+                    break;
+                case TypeDBO.SkyBet:
+                    _skyBetNew.IsIgnoredMarket = false;
+                    if (!string.IsNullOrEmpty(saveSkyBetId))
+                        GetScoreMarket(saveSkyBetId, TypeDBO.SkyBet);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(evntIDType), evntIDType, null);
+            }
         }
 
         /// <summary>
@@ -107,13 +163,16 @@ namespace Tennis_Betfair.Tennis
             {
                 if (_threadsScores.Count > 0)
                 {
-                    //return _threadsScores.Last().GetStatus();
+                    var threadBetFair = _threadsScores.Last().GetStatus().StateBetfair;
+                    var skyBet = _skyBetNew.StateMarket;
+                    var bet365 = _bet365.StateMarket;
+                    return new ThreadStatus(threadBetFair, bet365, skyBet);
                 }
                 return null;
             }
             catch (Exception)
             {
-                /**/
+                /*ignored*/
                 return null;
             }
         }
@@ -151,33 +210,25 @@ namespace Tennis_Betfair.Tennis
             {
                 case TypeDBO.Bet365:
                 {
+                    var bet365All = _bet365.GetAlllMathes();
+                    if (bet365All == null) return false;
+                    ParsingInfo.Parse(bet365All);
                     return true;
-                    /*   var bet365All = _bet365.GetAlllMathes();
-                        if (bet365All == null) return false;
-                        ParsingInfo.Parse(bet365All);
-                        return true;*/
                 }
                 case TypeDBO.BetFair:
                 {
+                    var betfairAll = _betfair.GetInPlayAllMarkets();
+                    if (betfairAll == null) return false;
+                    ParsingInfo.Parse(betfairAll);
                     return true;
-                    /*  var betfairAll = _betfair.GetInPlayAllMarkets();
-                        if (betfairAll == null) return false;
-                        ParsingInfo.Parse(betfairAll);
-                        return true;*/
                 }
                 case TypeDBO.SkyBet:
-                    {
-                        var skyBetAll = _skyBetNew.GetAlllMathes();
-                        if (skyBetAll == null) return false;
-                        ParsingInfo.Parse(skyBetAll);
-                        return true;
-
-                        /*
-                        var skyBetAll = _skyBet.GetMartches();
-                        if (skyBetAll == null) return false;
-                        ParsingInfo.Parse(skyBetAll);
-                        return true;*/
-                    }
+                {
+                    var skyBetAll = _skyBetNew.GetAlllMathes();
+                    if (skyBetAll == null) return false;
+                    ParsingInfo.Parse(skyBetAll);
+                    return true;
+                }
                 default:
                     return false;
             }
@@ -196,34 +247,40 @@ namespace Tennis_Betfair.Tennis
                 case TypeDBO.Bet365:
                 {
                     var bet365 = _bet365.SuscribeToScores(eventId);
+                    if (bet365 == MarketStatus.Closed)
+                        return false;
+                    saveBet365Id = eventId;
                     var currentScore = _bet365.GetCurrentScores();
                     var currentScore2 = _bet365.GetCurrentScores();
-                    if ((currentScore == null) || (currentScore.Count == 0))
-                        if ((currentScore2 != null) && (currentScore2.Count != 0))
-                        {
-                            ParsingInfo.Parse(currentScore2);
-                            return true;
-                        }
-                        else
+                    if ((currentScore2 == null) || (currentScore2.Count == 0))
+                    {
+                        if ((currentScore != null) && (currentScore.Count != 0))
                         {
                             ParsingInfo.Parse(currentScore);
                             return true;
                         }
-                    return false; 
+                    }
+                    else
+                    {
+                        ParsingInfo.Parse(currentScore2);
+                        return true;
+                    }
+                    return false;
                 }
                 case TypeDBO.BetFair:
                 {
-                    var betfairReturn =
-                        _betfair.GetScoreEvent(long.Parse(eventId));
+                    var betfairReturn = _betfair.GetScoreEvent(long.Parse(eventId));
                     if (betfairReturn.Count == 0) return false;
                     if (betfairReturn[0].matchStatus == null) return false;
                     ParsingInfo.Parse(betfairReturn);
+
                     return true;
                 }
                 case TypeDBO.SkyBet:
                 {
                     var newSkyBetReturn = _skyBetNew.GetScoreses(eventId);
                     ParsingInfo.Parse(newSkyBetReturn);
+                    saveSkyBetId = eventId;
                     return true;
                 }
                 default:
@@ -242,6 +299,7 @@ namespace Tennis_Betfair.Tennis
                     _countContect = 0;
                     break;
                 }
+
                 if (!good)
                 {
                     _countContect++;
@@ -255,7 +313,5 @@ namespace Tennis_Betfair.Tennis
 
 
         /*End methods*/
-
-        
     }
 }

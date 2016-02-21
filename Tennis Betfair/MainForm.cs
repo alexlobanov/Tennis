@@ -14,6 +14,7 @@ using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
+using CefSharp;
 using Syncfusion.Windows.Forms;
 using Syncfusion.Windows.Forms.Tools;
 using Tennis_Betfair.DBO;
@@ -29,6 +30,9 @@ namespace Tennis_Betfair
     {
         public delegate void ChangedCheckHandler(ChangedCheckEventArgs checkEvent);
 
+        public delegate void ChengedMessage(MessagesEventArgs messagesEvent);
+
+        
         private readonly AllMarkets _allMarkets;
 
         private readonly Thread UiThread;
@@ -55,8 +59,16 @@ namespace Tennis_Betfair
             _allMarkets = new AllMarkets();
             Market.MarketChanged += OnMarketChangedEvent;
             ParsingInfo.PlayerChanged += OnPlayerChanged;
+
             Bet365.PlayerChanged += OnPlayerChanged;
+            NewSkyBet.PlayerChanged += OnPlayerChanged;
+
+            Bet365.MessageChanged += OnMessageChanged;
+            NewSkyBet.MessageChanged += OnMessageChanged;
+
             AllMarkets.LoadedEvent += OnLoadedEvent;
+
+            
 
             UiThread = new Thread(Start) {Name = "UiThread"};
             UiThread.Start();
@@ -64,6 +76,32 @@ namespace Tennis_Betfair
             CheckConnetionThread = new Thread(CheckConnetion) {Name = "CheckStatus"};
             CheckConnetionThread.Start();
             isStop = false;
+        }
+
+        private void OnMessageChanged(MessagesEventArgs messagesEvent)
+        {
+             var stringToInsert = "";
+            switch (messagesEvent.TypeDbo)
+            {
+                case TypeDBO.None:
+                    break;
+                case TypeDBO.BetFair:
+                    break;
+                case TypeDBO.Bet365:
+                    stringToInsert = "Player1: " + messagesEvent.MessagePlayerOne + "              Player2: " + messagesEvent.MessagePlayerTwo;
+                    labelBet365Info.Invoke(new System.Action(() =>
+                    {
+                        labelBet365Info.Text = stringToInsert;
+                    }));
+                    break;
+                case TypeDBO.SkyBet:
+                    stringToInsert = messagesEvent.Message;
+                    labelSkyInfo.Invoke(new System.Action(() =>
+                    {
+                        labelSkyInfo.Text = stringToInsert;
+                    }));
+                    break;
+            }
         }
 
         private void CheckConnetion()
@@ -80,7 +118,6 @@ namespace Tennis_Betfair
                 }
                 else
                 {
-
                     ChangeImageConnection(pictureBox365, CheckInternetConenction.CheckConnection(TypeDBO.Bet365));
                     ChangeImageConnection(pictureBoxBF, CheckInternetConenction.CheckConnection(TypeDBO.BetFair));
                     ChangeImageConnection(pictureBoxSB, CheckInternetConenction.CheckConnection(TypeDBO.SkyBet));
@@ -149,7 +186,7 @@ namespace Tennis_Betfair
                     }
                     label11.Invoke(new Action(() => { label11.Text = Closed.Nodes.Count.ToString(); }));
                     textBoxExt5.Invoke(new Action(() => { getStateThread(elem); }));
-                    if ((elem?.State365 == ThreadState.Stopped) && (elem?.StateBetfair == ThreadState.Stopped))
+                    if ((elem?.State365 == ThreadState.Stopped) && (elem?.StateBetfair == ThreadState.Stopped) && (elem.StateSky == ThreadState.Stopped))
                     {
                         radioButtonAdv1.Invoke(new Action(() =>
                         {
@@ -196,11 +233,10 @@ namespace Tennis_Betfair
                 var skybetScore = marketArgs.ChangetMarket.GetSkyBetS();
 
                 digitalGauge1.Value = marketArgs.ChangetMarket.GetNewS();
-                textBoxMarket.Text = marketArgs.ChangetMarket.MarketName;
 
-                betFairScore = CheckForNullScore(betFairScore, labelBetfairInfo);
-                bet365Score = CheckForNullScore(bet365Score, labelBet365Info);
-                skybetScore = CheckForNullScore(skybetScore, labelSkyInfo);
+                betFairScore = CheckForNullScore(betFairScore, labelBetfairInfo, TypeDBO.BetFair);
+                bet365Score = CheckForNullScore(bet365Score, labelBet365Info, TypeDBO.Bet365);
+                skybetScore = CheckForNullScore(skybetScore, labelSkyInfo, TypeDBO.SkyBet);
 
                 if (marketArgs.ChangetMarket.IsClose)
                 {
@@ -227,16 +263,30 @@ namespace Tennis_Betfair
             }));
         }
 
-        private string CheckForNullScore(string score, Label labelToView)
+        private string CheckForNullScore(string score, Label labelToView,TypeDBO type)
         {
-            switch (score)
+            switch (type)
             {
-                case " : ":
-                    score = "No score";
-                    labelToView.Visible = true;
+                case TypeDBO.BetFair:
+                    if (score.Equals(" : "))
+                    {
+                        score = "No score";
+                        labelToView.Text = "No game information on Betfair. It can be tried to update market.";
+                    }
                     break;
-                default:
-                    labelToView.Visible = false;
+                case TypeDBO.Bet365:
+                    if (score.Equals(" : "))
+                    {
+                        score = "No score";
+                        labelToView.Text = "No game information on Bet365. It can be tried to update market.";
+                    }
+                    break;
+                case TypeDBO.SkyBet:
+                    if (score.Equals(" : "))
+                    {
+                        score = "No score";
+                        labelToView.Text = "No game information on SkyBet. It can be tried to update market.";
+                    }
                     break;
             }
             return score;
@@ -247,6 +297,18 @@ namespace Tennis_Betfair
             switch (toClickIndex)
             {
                 case 0:
+                    if (radioButtonAdv1.Checked)
+                        if ((Player.toIntScore(marketArgs.ChangetMarket.ScoreNewOne) == 0) && (prevPlayerOneScore != Player.toIntScore(marketArgs.ChangetMarket.ScoreNewOne)))
+                        {
+                            prevClickScore = 0;
+                            SimulateMouseClick.DoMouseClick();
+                        }
+                    if (radioButtonAdv2.Checked)
+                        if ((Player.toIntScore(marketArgs.ChangetMarket.ScoreNewTwo) == 0) && (prevPlayerTwoScore != Player.toIntScore(marketArgs.ChangetMarket.ScoreNewTwo)))
+                        {
+                            prevClickScore = 0;
+                            SimulateMouseClick.DoMouseClick();
+                        }
                     break;
                 case 15:
                     if (radioButtonAdv1.Checked)
@@ -375,8 +437,11 @@ namespace Tennis_Betfair
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            Cef.Shutdown();
             _allMarkets.StopThreads();
             isStop = true;
+            _allMarkets.isStop = true;
+            
         }
 
         private void treeViewAdv1_OnNodeReplaced(object sender, TreeNodeAdvOnReplacedArgs e)
@@ -491,12 +556,6 @@ namespace Tennis_Betfair
                 _allMarkets.MarketIgnore(TypeDBO.Bet365);
             if (checkBoxSky.Checked)
                 _allMarkets.MarketIgnore(TypeDBO.SkyBet);
-            if (checkBoxNotIgnore.Checked)
-            {
-                checkBoxBet365.Checked = false;
-                checkBoxBetfair.Checked = false;
-                checkBoxSky.Checked = false;
-            }
         }
 
         private void checkBoxBetfair_CheckStateChanged(object sender, EventArgs e)
@@ -504,7 +563,6 @@ namespace Tennis_Betfair
             if (checkBoxBetfair.Checked)
             {
                 _allMarkets.MarketIgnore(TypeDBO.BetFair);
-                checkBoxNotIgnore.Checked = false;
             }
             else
             {
@@ -519,7 +577,6 @@ namespace Tennis_Betfair
             if (checkBoxBet365.Checked)
             {
                 _allMarkets.MarketIgnore(TypeDBO.Bet365);
-                checkBoxNotIgnore.Checked = false;
             }
             else
             {
@@ -534,7 +591,6 @@ namespace Tennis_Betfair
             if (checkBoxSky.Checked)
             {
                 _allMarkets.MarketIgnore(TypeDBO.SkyBet);
-                checkBoxNotIgnore.Checked = false;
             }
             else
             {
@@ -555,17 +611,20 @@ namespace Tennis_Betfair
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             _allMarkets.AbortThreads();
+            CheckConnetionThread.Abort();
         }
 
 
         private void button1_Click(object sender, EventArgs e)
         {
-            
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
 
         }
     }

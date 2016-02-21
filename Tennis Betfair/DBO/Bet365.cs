@@ -21,29 +21,61 @@ using Tennis_Betfair.Tennis;
 using Tennis_Betfair.TO;
 using Tennis_Betfair.TO.Bet365;
 using Tennis_Betfair.TO.NewBet365;
+using ThreadState = System.Threading.ThreadState;
 
 namespace Tennis_Betfair.DBO
 {
     public class Bet365
     {
         private ChromiumWebBrowser browser;
-        private bool isLoad;
+        public static bool isLoad;
         private string prevComp;
         public static event AllMarkets.PlayerChanged PlayerChanged;
+        private AllMarkets allMarkets;
 
-        public Bet365()
+
+        public System.Threading.ThreadState State;
+        public bool isIgnoredMarket;
+
+        public ThreadState StateMarket
         {
-            Debug.WriteLine("Start browser");
+            get { return State; }
+            set { State = value; }
+        }
+
+        public bool IsIgnoredMarket
+        {
+            get { return isIgnoredMarket; }
+            set
+            {
+                State = value ? ThreadState.Suspended : ThreadState.Running;
+                isIgnoredMarket = value;
+            }
+        }
+
+        public static event MainForm.ChengedMessage MessageChanged;
+        public Bet365(AllMarkets markteMarkets)
+        {
+            Debug.WriteLine("Start browser2");
             var cef = Chrome.Instanse;
             isLoad = false;
+            isIgnoredMarket = false;
             browser = Chrome.InstBet365;
             browser.ConsoleMessage += BrowserOnConsoleMessage;
-
+            allMarkets = markteMarkets;
         }
+
+        private string prevScoreOne = "0";
+        private string prevScoreTwo = "0";
 
         private void BrowserOnConsoleMessage(object sender, ConsoleMessageEventArgs consoleMessageEventArgs)
         {     
-            Console.WriteLine("Console: " + consoleMessageEventArgs.Message);
+            if (isIgnoredMarket)
+            {
+                Console.WriteLine("[IGNORED][Bet365]Console: " + consoleMessageEventArgs.Message);
+                return;
+            }
+            Console.WriteLine("[Bet365]Console: " + consoleMessageEventArgs.Message);
             if (consoleMessageEventArgs.Message.Contains("Mixed Content"))
             {
                 isLoad = true;
@@ -56,12 +88,43 @@ namespace Tennis_Betfair.DBO
                 var tmp = consoleMessageEventArgs.Message.Split('|');
                 var elem = tmp[1];
                 var scores = JsonConvert.DeserializeObject<List<Scores>>(elem);
+                var player1 = scores[0];
+                var player2 = scores[1];
+                var eventId = player1.name + "|" + player2.name;
+                if ((!string.IsNullOrWhiteSpace(prevScoreOne)) && (!string.IsNullOrWhiteSpace(prevScoreTwo)))
+                {
+                    var score1 = player1.score;
+                    var score2 = player2.score;
+                    if (!((score1 == "0") && (score2 == "0")))
+                        if (((score1 == "0") && (score1 != prevScoreOne)) || ((score2 == "0") && (score2 != prevScoreTwo)))
+                            return;
+                }
+                foreach (var currentMarket in allMarkets.ParsingInfo.AllMarketsHashSet)
+                {
+                    if (!(string.IsNullOrEmpty(currentMarket.Bet365EventId)) &&(currentMarket.Bet365EventId.Equals(eventId)))
+                    {
+                        prevScoreOne = player1.score;
+                        prevScoreTwo = player2.score;
+                        currentMarket.Player1.ScoreBet366 = player1.score;
+                        currentMarket.Player2.ScoreBet366 = player2.score;
+                        PlayerChanged?.Invoke(new ScoreUpdEventArgs(currentMarket));
+                        break;
+                    }
+                }
+            }
 
-                var player1 = new Player(scores[0].name,scores[0].score,TypeDBO.Bet365);
-                var player2 = new Player(scores[1].name, scores[1].score, TypeDBO.Bet365);
-                var eventId = player1.Name + "|" + player2.Name;
-                var market = new Market(null, player1, player2, eventId, TypeDBO.Bet365);
-                PlayerChanged?.Invoke(new ScoreUpdEventArgs(market));
+            if (consoleMessageEventArgs.Message[0] == '2')
+            {
+                var elem = consoleMessageEventArgs.Message.Split('/');
+                var tmp = elem[1].Split('|');
+                if (tmp.Length == 2)
+                {
+                    var player1Message = tmp[0];
+                    var player2Message = tmp[1];
+                    MessageChanged?.Invoke(new MessagesEventArgs(TypeDBO.Bet365, player1Message, player2Message));
+                    
+                }
+
             }
         }
 
@@ -74,22 +137,19 @@ namespace Tennis_Betfair.DBO
             if (loadingStateChangedEventArgs.IsLoading) return;
             if (!isLoad)
                 return;
-            getScreenShot("one");
-            Thread.Sleep(50);
             var all = browser.EvaluateScriptAsync(allJs);
             all.ContinueWith(task2 =>
             {
-                Thread.Sleep(100);
+                CheckLoaded();
                 var click = browser.EvaluateScriptAsync("clickToTennis()");
-                Thread.Sleep(50);
                 if (click.Result.Success != true)
                 {
-#if DEBUG
+#if DEBUG   
                    // getScreenShot("two");
 #endif
                     throw new Exception("Exeption in stateChanged" + click.Result.Message);
                 }
-
+                CheckLoaded();
                 Debug.WriteLine("Click");
                 var suscribe = browser.EvaluateScriptAsync("suscribeEventsScores()");
                 if (!string.IsNullOrEmpty(prevComp))
@@ -104,6 +164,36 @@ namespace Tennis_Betfair.DBO
             });
         }
 
+        private void CheckLoaded()
+        {
+            var allJs = Properties.Resources.jsAllLoad;
+            while (true)
+            {
+                if (!browser.IsBrowserInitialized) continue;
+                if (!browser.IsLoading)
+                {
+                    try
+                    {
+                        var sss = browser.EvaluateScriptAsync(allJs,TimeSpan.FromSeconds(2)).Result;
+                        var clickTennis = browser.EvaluateScriptAsync("clickToTennis()").Result;
+                        var tt = browser.EvaluateScriptAsync("$('.ipo-Classification.sport_13').length == 1");
+                        if (!(bool)tt.Result.Result)
+                            return;
+                        var result = browser.EvaluateScriptAsync("checkLoad()",TimeSpan.FromSeconds(2)).Result;
+                        if ((result.Result != null) && ((bool) result.Result == true))
+                        {
+                            var ss = browser.EvaluateScriptAsync(allJs).Result;
+                            break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("EXEPTION: " + ex.Message + "Stack : " + ex.StackTrace);
+                    }
+                }
+                Thread.Sleep(200);
+            }
+        }
 
         private void getScreenShot(string str)
         {
@@ -145,6 +235,11 @@ namespace Tennis_Betfair.DBO
             mathesMarket.player2Name = players[1];
 
             var index = -1;
+            if (mathes == null)
+            {
+                State = ThreadState.Stopped;
+                return MarketStatus.Closed;
+            }
             foreach (var mathese in mathes)
             {
                 if ((mathesMarket.player2Name.Equals(mathese.player2Name)) && (mathesMarket.player1Name.Equals(mathese.player1Name)))
@@ -155,34 +250,56 @@ namespace Tennis_Betfair.DBO
             }
             var clickTennis = browser.EvaluateScriptAsync("clickToTennis()");
             if (index == -1)
-                return MarketStatus.Closed;
-            var result = ClickToMarket(index);
-            Thread.Sleep(200);
-            if (result != true)
-                return MarketStatus.Closed;
-            var suscribe = browser.EvaluateScriptAsync("suscribeEventsScores()");
-            if (suscribe.Result.Success)
             {
-                getScreenShot("END");
-                return MarketStatus.Open;
+                State = ThreadState.Stopped;
+                return MarketStatus.Closed;
             }
-            return MarketStatus.Closed;
+            CheckLoaded();
+            var result = ClickToMarket(index);
+            Thread.Sleep(100);
+            if (result != true)
+            {
+                State = ThreadState.Stopped;
+                return MarketStatus.Closed;
+            }
+            var suscribe = browser.EvaluateScriptAsync("suscribeEventsScores()");
+            if (suscribe.Result.Result != null)
+            {
+                while (true)
+                {
+                    var loadJs = browser.EvaluateScriptAsync(Properties.Resources.jsAllLoad).Result;
+                    var clickTennis1 = browser.EvaluateScriptAsync("clickToTennis()").Result;
+                    CheckLoaded();
+                    var result1 = ClickToMarket(index);
+                    Thread.Sleep(100);
+                    var res = browser.EvaluateScriptAsync("suscribeEventsScores()").Result;
+                    if (res.Result == null)
+                        break;
+                }
+            }
+            return MarketStatus.Open;
         }
 
         public bool ClickToMarket(int index)
         {
-            Thread.Sleep(50);
-            var ret =  browser.EvaluateScriptAsync($"clickToMathes({index})").Result.Success;
-            Thread.Sleep(50);
-            Debug.WriteLine("Index to click: " + index);
-            return ret;
+            var ret =  browser.EvaluateScriptAsync($"clickToMathes({index})").Result;
+            Debug.WriteLine("Index to click: " + index + " Message: " + ret.Message + " Result: " + ret.Result);
+            return ret.Success;
         }
 
         public List<Mathes> GetAlllMathes()
         {
             var allMarktes = new List<Mathes>();
-            browser.EvaluateScriptAsync("clickToTennis()");
-            var mathes = browser.EvaluateScriptAsync("getMathes()");
+            CheckLoaded();
+            var loadAllJs = browser.EvaluateScriptAsync(Properties.Resources.jsAllLoad).Result;
+
+            var tt = browser.EvaluateScriptAsync("$('.ipo-Classification.sport_13').length == 1");
+            if (!(bool)tt.Result.Result)
+                return default (List<Mathes>);
+
+            var sst = browser.EvaluateScriptAsync("clickToTennis()").Result;
+            CheckLoaded();
+            var mathes = browser.EvaluateScriptAsync("getMatches()");
             mathes.ContinueWith(task1 =>
             {
                 if (task1.Result.Result == null)
@@ -200,19 +317,18 @@ namespace Tennis_Betfair.DBO
         public List<Scores> GetCurrentScores()
         {
             var errmsg = "";
+            CheckLoaded();
             var result = browser.EvaluateScriptAsync("getScore()");
             var score = new List<Scores>();
-            Thread.Sleep(50);
             var res = result.Result;
             if (res.Result == null)
             {
                 errmsg = res.Message;
                 Debug.WriteLine("Exeption 'GetCurrentScores()': " + errmsg);
-                //var cc = browser.EvaluateScriptAsync("clickToTennis()").Result;
-                //var vv = browser.EvaluateScriptAsync("clickToMathes(0)").Result;
                 int countUpdate = 0;
                 while (true)
                 {
+                    res = browser.EvaluateScriptAsync(Properties.Resources.jsAllLoad).Result;
                     result = browser.EvaluateScriptAsync("getScore()");
                     Thread.Sleep(100);
                     if (result.Result.Result != null)
@@ -220,14 +336,16 @@ namespace Tennis_Betfair.DBO
                         res = result.Result;
                         break;
                     }
+                    countUpdate++;
                     if (countUpdate > 25)
                     {
                         browser.Reload();
-                        return null;
+                        CheckLoaded();
+                        countUpdate = 0;
                     }
                 }
                 #if DEBUG
-                  getScreenShot("six");
+               //   getScreenShot("six");
                 #endif
                 //throw new Exception("Ex in getCurrentScore: " + errmsg);
             }

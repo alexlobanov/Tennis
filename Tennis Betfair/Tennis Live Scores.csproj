@@ -44,7 +44,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -147,6 +147,7 @@
     <Compile Include="DBO\Interface\IBrowserParse.cs" />
     <Compile Include="DBO\NewSkyBet.cs" />
     <Compile Include="DBO\SetIEFunc.cs" />
+    <Compile Include="Events\MessagesEventArgs.cs" />
     <Compile Include="Others\CheckInternetConenction.cs" />
     <Compile Include="DBO\Bet365Class.cs" />
     <Compile Include="DBO\ParserBet365\Connection.cs" />
@@ -226,6 +227,7 @@
   <ItemGroup>
     <Content Include="Prince_of_tennis_favicon.ico" />
     <Content Include="Resources\glossy-yellow-circle-button-md %281%29.png" />
+    <None Include="Resources\tennis-promo.jpg" />
     <None Include="Resources\red.png" />
     <None Include="Resources\green.png" />
     <None Include="Resources\yellow.png" />

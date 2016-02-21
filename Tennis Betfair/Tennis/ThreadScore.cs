@@ -22,9 +22,9 @@ namespace Tennis_Betfair.Tennis
 
         private int countUpdate;
 
-        private bool isPosibleStop365;
-        private bool isPosibleStopBet;
-        private bool isPosibleStopSkyBet;
+        public bool isPosibleStop365;
+        public bool isPosibleStopBet;
+        public bool isPosibleStopSkyBet;
 
         private bool isStop;
 
@@ -39,20 +39,24 @@ namespace Tennis_Betfair.Tennis
             this.allMarkets = allMarkets;
 
             allMarkets.GetScoreMarket(this.bet365Id, TypeDBO.Bet365);
+            allMarkets.GetScoreMarket(this.skyBetId, TypeDBO.SkyBet);
+
             //threadScore365 = new Thread(GetScore);
             threadBetfair = new Thread(GetScore);
-            threadSkyBet = new Thread(GetScore);
+            //threadSkyBet = new Thread(GetScore);
 
-        //    threadScore365.Name = "BetScore365 " + bet365Id;
             threadBetfair.Name = "BetFair " + betfairId;
+       /*     threadScore365.Name = "BetScore365 " + bet365Id;
+            threadScore365.IsBackground = true;
             threadSkyBet.Name = "SkyBet " + skyBetId;
+            threadSkyBet.IsBackground = true;*/
         }
 
     
 
         public ThreadStatus GetStatus()
         {
-            return new ThreadStatus(threadBetfair.ThreadState, threadScore365.ThreadState, threadSkyBet.ThreadState);
+            return new ThreadStatus(threadBetfair.ThreadState);
         }
 
 
@@ -62,20 +66,6 @@ namespace Tennis_Betfair.Tennis
             {
                 case TypeDBO.BetFair:
                     threadBetfair.Suspend();
-                    break;
-                case TypeDBO.Bet365:
-                    threadScore365.Suspend();
-                    break;
-                case TypeDBO.SkyBet:
-                    threadSkyBet.Suspend();
-                    break;
-                case TypeDBO.None:
-                    if (threadBetfair.ThreadState != ThreadState.Running)
-                        threadBetfair.Resume();
-                    if (threadScore365.ThreadState != ThreadState.Running)
-                        threadScore365.Resume();
-                    if (threadSkyBet.ThreadState != ThreadState.Running)
-                        threadSkyBet.Resume();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(marketType), marketType, null);
@@ -89,19 +79,13 @@ namespace Tennis_Betfair.Tennis
                 case TypeDBO.BetFair:
                     threadBetfair.Resume();
                     break;
-                case TypeDBO.Bet365:
-                    threadScore365.Resume();
-                    break;
-                case TypeDBO.SkyBet:
-                    threadSkyBet.Resume();
-                    break;
             }
         }
 
         public void StartThreads()
         {
-          //  threadScore365.Start(new GetScoreStruct(TypeDBO.Bet365, bet365Id));
-           // threadBetfair.Start(new GetScoreStruct(TypeDBO.BetFair, betfairId));
+           // threadScore365.Start(new GetScoreStruct(TypeDBO.Bet365, bet365Id));
+            threadBetfair.Start(new GetScoreStruct(TypeDBO.BetFair, betfairId));
            // threadSkyBet.Start(new GetScoreStruct(TypeDBO.SkyBet, skyBetId));
         }
 
@@ -180,34 +164,35 @@ namespace Tennis_Betfair.Tennis
         {
             var information = (GetScoreStruct) info;
             var count = 0;
+            var isFirst = true; 
             while (true)
             {
-                var result = false;
+                var result = true;
                 UpdateEventId();
                 if (isStop) return;
                 if ((string) information.EventId != null)
-                    result = allMarkets.GetScoreMarket((string) information.EventId, information.TypeDbo);
+                    if (isFirst)
+                    {
+                        result = allMarkets.GetScoreMarket((string) information.EventId, information.TypeDbo);
+                        isFirst = false;
+                    }
+                if ((information.TypeDbo == TypeDBO.BetFair))
+                {
+                    isFirst = true;
+                }
                 if (result)
                 {
-                    if (information.TypeDbo != TypeDBO.SkyBet)
-                        Thread.Sleep(50);
                     count = 0;
                 }
                 else
                 {
                     count++;
                 }
-                if (count < 15) continue;
+                if (count < 20) continue;
                 switch (information.TypeDbo)
                 {
                     case TypeDBO.BetFair:
                         isPosibleStopBet = true;
-                        break;
-                    case TypeDBO.Bet365:
-                        isPosibleStop365 = true;
-                        break;
-                    case TypeDBO.SkyBet:
-                        isPosibleStopSkyBet = true;
                         break;
                 }
                 if ((isPosibleStop365) && (isPosibleStopBet) && (isPosibleStopSkyBet))

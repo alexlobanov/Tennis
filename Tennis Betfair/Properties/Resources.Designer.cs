@@ -72,16 +72,16 @@ namespace Tennis_Betfair.Properties {
         
         /// <summary>
         ///   Ищет локализованную строку, похожую на function suscribeEventsScores() {
+        ///    if ($(&apos;.yellow.last.ml13-ScoreBoardColumn&apos;).length == 0)
+        ///        return false;
+        ///    if ($(&apos;.ml13-Anims_H3Text&apos;).length == 0)
+        ///        return false;
         ///    $(&apos;.yellow.last.ml13-ScoreBoardColumn&apos;).bind(&quot;DOMSubtreeModified&quot;,function(){
         ///        var players = $(&apos;.ml13-ScoreBoard_HeaderText&apos;);
         ///        var playerOneName = players[0].textContent;
         ///        var playerTwoName = players[1].textContent;
         ///        var scores = $(&apos;.yellow.last.ml13-ScoreBoardColumn&apos;).children();
-        ///        var scoreOne = scores[1].textContent;
-        ///        var scoreTwo = scores[2].textContent;
-        ///        var playerOne = {
-        ///            name: playerOneName,
-        ///   [остаток строки не уместился]&quot;;.
+        ///    [остаток строки не уместился]&quot;;.
         /// </summary>
         internal static string jsAllLoad {
             get {
@@ -90,18 +90,19 @@ namespace Tennis_Betfair.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на function getMarkets() {
+        ///   Ищет локализованную строку, похожую на function getMarkets() { 
         ///    try {
+        ///        console.log(&quot;Я тут&quot;);
         ///        var jsonObj = [];
-        ///        $(&apos;#content &gt; div:nth-child(41) &gt; div:nth-child(2)&apos;).find(&quot;li&quot;).each(function() {
+        ///        $(&apos;#content &gt; div:nth-child(41) &gt; div:nth-child(2)&apos;).find(&quot;li&quot;).each(function() 
+        ///        {
         ///                var playersName = jQuery.trim(this.textContent).split(&quot; v &quot;);
         ///                var player1Name = playersName[0];
         ///                var player2Name = playersName[1];
-        ///                
         ///                var symbol = &quot;*&quot;;
         ///                if (player1Name.indexOf(symbol) &gt; -1)
         ///                {
-        ///                    player1Name = player1Name.slic [остаток строки не уместился]&quot;;.
+        ///                    player [остаток строки не уместился]&quot;;.
         /// </summary>
         internal static string jsAllLoadSkybet {
             get {
@@ -125,6 +126,16 @@ namespace Tennis_Betfair.Properties {
         internal static System.Drawing.Bitmap red {
             get {
                 object obj = ResourceManager.GetObject("red", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap tennis_promo {
+            get {
+                object obj = ResourceManager.GetObject("tennis_promo", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
